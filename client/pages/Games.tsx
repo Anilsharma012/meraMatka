@@ -281,11 +281,9 @@ const Games = () => {
                                         </p>
                                       </div>
                                       <Badge
-                                        className={getStatusColor(
-                                          game.currentStatus,
-                                        )}
+                                        className={getStatusColor(game)}
                                       >
-                                        {getStatusText(game.currentStatus)}
+                                        {getStatusText(game)}
                                       </Badge>
                                     </div>
 
