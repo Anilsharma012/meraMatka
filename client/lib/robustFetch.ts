@@ -109,7 +109,7 @@ export async function robustFetch(
       return {
         success: true,
         data,
-        status: response.status,
+        status: responseStatus,
       };
 
     } catch (fetchError: any) {
