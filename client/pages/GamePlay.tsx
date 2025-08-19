@@ -578,10 +578,11 @@ const GamePlay = () => {
       // Clear timeout if request completes successfully
       clearTimeout(timeoutId);
 
-      // Store response status before parsing
+      // Clone response immediately to prevent any body consumption issues
+      const responseClone = response.clone();
       const isResponseOk = response.ok;
 
-      // Log basic response info without consuming the body
+      // Log basic response info
       console.log("🔍 Response details:", {
         status: response.status,
         statusText: response.statusText,
@@ -590,8 +591,9 @@ const GamePlay = () => {
 
       let data;
       try {
-        // Direct response parsing to avoid any potential body consumption issues
-        const responseText = await response.text();
+        // Use cloned response to ensure we never have body consumption conflicts
+        const responseText = await responseClone.text();
+
         if (!responseText) {
           throw new Error("Empty response from server");
         }
@@ -605,6 +607,10 @@ const GamePlay = () => {
         }
       } catch (parseError) {
         console.error("❌ Critical error during response parsing:", parseError);
+        // If parsing fails, try to provide more context
+        if (parseError instanceof Error && parseError.message.includes("already read")) {
+          throw new Error("Response body was consumed elsewhere - this is a race condition issue");
+        }
         throw new Error("Failed to parse server response");
       }
 
