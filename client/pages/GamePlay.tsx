@@ -572,7 +572,6 @@ const GamePlay = () => {
         status: response.status,
         statusText: response.statusText,
         ok: response.ok,
-        bodyUsed: response.bodyUsed,
       });
 
       let data;
