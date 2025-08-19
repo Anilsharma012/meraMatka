@@ -92,12 +92,10 @@ const Charts = () => {
       }
 
       // Use safe response parsing to avoid body consumption issues
-      let data: ApiResponse;
-      try {
-        data = await response.json();
-      } catch (jsonError) {
-        console.error('Failed to parse JSON response:', jsonError);
-        setError("Invalid response from server");
+      const data = await safeParseResponse(response);
+
+      if (data.error) {
+        setError(data.message || "Failed to load results");
         return;
       }
 
