@@ -567,11 +567,14 @@ const GamePlay = () => {
         body: JSON.stringify(betPayload),
       });
 
+      // Store response status before parsing
+      const isResponseOk = response.ok;
+
       // Log basic response info without consuming the body
       console.log("🔍 Response details:", {
         status: response.status,
         statusText: response.statusText,
-        ok: response.ok,
+        ok: isResponseOk,
       });
 
       let data;
