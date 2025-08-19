@@ -650,24 +650,34 @@ const GamePlay = () => {
         }
       }
     } catch (error: any) {
-      console.error("❌ Network error:", error);
+      console.error("❌ Bet placement error:", error);
 
-      // Handle different types of errors
-      if (error.name === "AbortError") {
-        console.log("🔌 Bet request was aborted (timeout or cancellation)");
-        toast({
-          variant: "destructive",
-          title: "Request Timeout",
-          description: "Bet request took too long. Please try again.",
-        });
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Network Error",
-          description:
-            "Failed to connect to server. Please check your internet connection.",
-        });
+      // Provide specific error messages based on error type
+      let errorTitle = "Bet Failed";
+      let errorDescription = "Unable to place bet. Please try again.";
+
+      if (error.message.includes("timeout")) {
+        errorTitle = "Request Timeout";
+        errorDescription = "The request took too long. Please check your connection and try again.";
+      } else if (error.message.includes("already read") || error.message.includes("body")) {
+        errorTitle = "Technical Error";
+        errorDescription = "A technical issue occurred. Please refresh the page and try again.";
+      } else if (error.message.includes("network") || error.message.includes("fetch")) {
+        errorTitle = "Connection Error";
+        errorDescription = "Unable to connect to server. Please check your internet connection.";
+      } else if (error.message.includes("JSON") || error.message.includes("parse")) {
+        errorTitle = "Server Error";
+        errorDescription = "The server sent an invalid response. Please try again.";
+      } else if (error.message) {
+        // Use the specific error message from the server
+        errorDescription = error.message;
       }
+
+      toast({
+        variant: "destructive",
+        title: errorTitle,
+        description: errorDescription,
+      });
     } finally {
       setPlacing(false);
     }
@@ -1170,7 +1180,7 @@ const GamePlay = () => {
             if (totalPlaced > 0) {
               toast({
                 title: "✅ Bet Placed",
-                description: `��${totalPlaced} placed across ${entries.length} Haruf bets.`,
+                description: `₹${totalPlaced} placed across ${entries.length} Haruf bets.`,
                 className: "border-green-500 bg-green-50 text-green-900",
               });
 
