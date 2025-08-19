@@ -62,10 +62,35 @@ export async function simpleFetch(
     
     console.log(`📡 Response received: ${status} ${statusText}`);
 
-    // Read response body once and only once
-    let responseText: string;
+    // Try different methods to read response body
+    let data: any = null;
+    let responseText = '';
+
     try {
-      responseText = await response.text();
+      // First try to read as JSON directly (most efficient)
+      if (response.headers.get('content-type')?.includes('application/json')) {
+        try {
+          data = await response.json();
+          console.log('✅ Successfully read response as JSON');
+        } catch (jsonError) {
+          console.log('⚠️ JSON parsing failed, trying text method');
+          // Response body might be consumed, create a new request
+          throw new Error('JSON parsing failed, response body consumed');
+        }
+      } else {
+        // Read as text for non-JSON responses
+        responseText = await response.text();
+        console.log('✅ Successfully read response as text, length:', responseText.length);
+
+        if (responseText.trim()) {
+          try {
+            data = JSON.parse(responseText);
+          } catch (jsonError) {
+            console.log('⚠️ Response is not JSON:', responseText.substring(0, 100));
+            data = { message: responseText };
+          }
+        }
+      }
     } catch (bodyError) {
       console.error('❌ Failed to read response body:', bodyError);
       return {
@@ -73,22 +98,6 @@ export async function simpleFetch(
         error: 'Could not read response from server',
         status,
       };
-    }
-
-    // Parse JSON if we have content
-    let data: any = null;
-    if (responseText.trim()) {
-      try {
-        data = JSON.parse(responseText);
-      } catch (jsonError) {
-        console.error('❌ Failed to parse JSON:', jsonError);
-        console.error('Response text:', responseText.substring(0, 200));
-        return {
-          success: false,
-          error: 'Server returned invalid JSON',
-          status,
-        };
-      }
     }
 
     return {
