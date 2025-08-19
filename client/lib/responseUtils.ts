@@ -68,6 +68,17 @@ export async function safeParseResponse(response: Response): Promise<any> {
   } catch (readError) {
     console.error("❌ Failed to read response:", readError);
 
+    // Check if this is a "body already read" error
+    const errorMessage = readError instanceof Error ? readError.message : String(readError);
+    if (errorMessage.includes("already read") || errorMessage.includes("body used")) {
+      console.error("❌ Response body was already consumed");
+      return {
+        success: false,
+        message: "Response body was already read",
+        error: true,
+      };
+    }
+
     return {
       success: false,
       message: "Failed to read response from server",
