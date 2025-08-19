@@ -471,4 +471,50 @@ function formatMarketName(marketId: string): string {
   ).join(' ');
 }
 
+// Helper function to get game icon
+function getGameIcon(marketName: string, gameType?: string): string {
+  const name = marketName.toLowerCase();
+
+  if (name.includes('gali')) return '⚔️';
+  if (name.includes('disawer') || name.includes('disawar')) return '🎲';
+  if (name.includes('delhi')) return '🦁';
+  if (name.includes('dubai')) return '🏢';
+  if (name.includes('mumbai')) return '🌊';
+  if (name.includes('kolkata')) return '🎭';
+  if (name.includes('chennai')) return '🏛️';
+  if (name.includes('bangalore')) return '🌟';
+  if (name.includes('hyderabad')) return '💎';
+  if (name.includes('rajdhani')) return '👑';
+
+  // Default icons by type
+  if (gameType === 'jodi') return '🎯';
+  if (gameType === 'haruf') return '🎲';
+  if (gameType === 'crossing') return '🔄';
+
+  return '🎮';
+}
+
+// Helper function to get game color
+function getGameColor(marketName: string, gameType?: string): string {
+  const name = marketName.toLowerCase();
+
+  if (name.includes('gali')) return 'from-red-500 to-red-600';
+  if (name.includes('disawer') || name.includes('disawar')) return 'from-indigo-500 to-indigo-600';
+  if (name.includes('delhi')) return 'from-yellow-500 to-yellow-600';
+  if (name.includes('dubai')) return 'from-blue-500 to-blue-600';
+  if (name.includes('mumbai')) return 'from-purple-500 to-purple-600';
+  if (name.includes('kolkata')) return 'from-green-500 to-green-600';
+  if (name.includes('chennai')) return 'from-orange-500 to-orange-600';
+  if (name.includes('bangalore')) return 'from-pink-500 to-pink-600';
+  if (name.includes('hyderabad')) return 'from-teal-500 to-teal-600';
+  if (name.includes('rajdhani')) return 'from-amber-500 to-amber-600';
+
+  // Default colors by type
+  if (gameType === 'jodi') return 'from-blue-500 to-blue-600';
+  if (gameType === 'haruf') return 'from-green-500 to-green-600';
+  if (gameType === 'crossing') return 'from-purple-500 to-purple-600';
+
+  return 'from-gray-500 to-gray-600';
+}
+
 export default router;
