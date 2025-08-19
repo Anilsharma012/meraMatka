@@ -10,21 +10,10 @@ export async function safeParseResponse(response: Response): Promise<any> {
     bodyUsed: response.bodyUsed
   });
 
-  // Store all response properties IMMEDIATELY to avoid body consumption issues
-  const bodyUsed = response.bodyUsed;
+  // Store response properties to avoid body consumption issues
   const contentType = response.headers.get("content-type");
   const responseStatus = response.status;
   const responseStatusText = response.statusText;
-
-  // Check if response body has already been consumed
-  if (bodyUsed) {
-    console.error("❌ Response body already consumed at entry");
-    return {
-      success: false,
-      message: "Response body was already read",
-      error: true,
-    };
-  }
 
   try {
     console.log("🔍 About to read response.text()");
