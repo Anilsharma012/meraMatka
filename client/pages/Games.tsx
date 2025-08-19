@@ -339,7 +339,9 @@ const Games = () => {
                                       disabled={game.currentStatus !== "open"}
                                     >
                                       <Play className="h-3 w-3 mr-1" />
-                                      {game.currentStatus === "open"
+                                      {game.currentStatus === "open" &&
+                                       game.acceptingBets !== false &&
+                                       (!game.endTimeUTC || new Date() < new Date(game.endTimeUTC))
                                         ? "Play Now"
                                         : "Not Available"}
                                     </Button>
