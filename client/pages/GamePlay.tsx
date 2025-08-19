@@ -565,8 +565,8 @@ const GamePlay = () => {
 
       console.log("🎯 Placing REAL bet in MongoDB:", betPayload);
 
-      // Use simple fetch to avoid any body consumption issues
-      const fetchResult = await simpleFetch(`${BASE_URL}/api/games/place-bet`, {
+      // Use XMLHttpRequest to completely avoid fetch API body consumption issues
+      const fetchResult = await xhrFetch(`${BASE_URL}/api/games/place-bet`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
