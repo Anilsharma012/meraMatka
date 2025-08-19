@@ -558,6 +558,13 @@ const GamePlay = () => {
 
       console.log("🎯 Placing REAL bet in MongoDB:", betPayload);
 
+      // Add AbortController to prevent race conditions if user clicks multiple times
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => {
+        console.log("⏰ Bet request timeout after 15 seconds");
+        controller.abort();
+      }, 15000);
+
       const response = await fetch(`${BASE_URL}/api/games/place-bet`, {
         method: "POST",
         headers: {
@@ -565,7 +572,11 @@ const GamePlay = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(betPayload),
+        signal: controller.signal,
       });
+
+      // Clear timeout if request completes successfully
+      clearTimeout(timeoutId);
 
       // Store response status before parsing
       const isResponseOk = response.ok;
