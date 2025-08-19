@@ -565,8 +565,8 @@ const GamePlay = () => {
 
       console.log("🎯 Placing REAL bet in MongoDB:", betPayload);
 
-      // Use robust fetch to eliminate body consumption issues
-      const fetchResult = await robustFetch(`${BASE_URL}/api/games/place-bet`, {
+      // Use simple fetch to avoid any body consumption issues
+      const fetchResult = await simpleFetch(`${BASE_URL}/api/games/place-bet`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -574,7 +574,6 @@ const GamePlay = () => {
         },
         body: JSON.stringify(betPayload),
         timeout: 15000,
-        retries: 2,
       });
 
       if (!fetchResult.success) {
