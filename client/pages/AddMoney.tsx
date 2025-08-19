@@ -245,34 +245,18 @@ const AddMoney = () => {
         }),
       });
 
-      // Handle response more robustly
+      // Handle response more robustly using safe parsing
       let data = null;
       try {
-        // Clone the response to avoid "body stream already read" errors
-        const responseClone = response.clone();
+        data = await safeParseResponse(response);
 
-        // Try to parse as JSON first
-        try {
-          data = await response.json();
-        } catch (jsonError) {
-          console.log("JSON parsing failed, trying text:", jsonError.message);
-          // If JSON parsing fails, try reading as text from the cloned response
-          try {
-            const responseText = await responseClone.text();
-            console.log("Response text:", responseText);
-
-            // Try to parse the text as JSON
-            if (responseText) {
-              data = JSON.parse(responseText);
-            }
-          } catch (textError) {
-            console.error("Could not read response as text:", textError);
-            // If we can't read the response, create a default response based on status
-            if (response.ok) {
-              data = { message: "Payment request submitted successfully!" };
-            } else {
-              data = { message: "Failed to submit payment request" };
-            }
+        if (data.error) {
+          console.error("Response parsing failed:", data.message);
+          // Create a default response based on status if parsing fails
+          if (response.ok) {
+            data = { message: "Payment request submitted successfully!" };
+          } else {
+            data = { message: "Failed to submit payment request" };
           }
         }
       } catch (error) {
