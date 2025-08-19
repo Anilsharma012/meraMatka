@@ -565,72 +565,24 @@ const GamePlay = () => {
 
       console.log("🎯 Placing REAL bet in MongoDB:", betPayload);
 
-      // Create isolated fetch function to avoid any potential conflicts
-      const placeBetRequest = async () => {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => {
-          console.log("⏰ Bet request timeout after 15 seconds");
-          controller.abort();
-        }, 15000);
-
-        try {
-          const response = await fetch(`${BASE_URL}/api/games/place-bet`, {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(betPayload),
-            signal: controller.signal,
-            // Add cache control to prevent any caching issues
-            cache: 'no-cache',
-          });
-
-          clearTimeout(timeoutId);
-          return response;
-        } catch (error) {
-          clearTimeout(timeoutId);
-          throw error;
-        }
-      };
-
-      const response = await placeBetRequest();
-
-      // Clone response immediately to prevent any body consumption issues
-      const responseClone = response.clone();
-      const isResponseOk = response.ok;
-
-      // Log basic response info
-      console.log("🔍 Response details:", {
-        status: response.status,
-        statusText: response.statusText,
-        ok: isResponseOk,
+      // Use robust fetch to eliminate body consumption issues
+      const fetchResult = await robustFetch(`${BASE_URL}/api/games/place-bet`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(betPayload),
+        timeout: 15000,
+        retries: 2,
       });
 
-      let data;
-      try {
-        // Use cloned response to ensure we never have body consumption conflicts
-        const responseText = await responseClone.text();
-
-        if (!responseText) {
-          throw new Error("Empty response from server");
-        }
-
-        try {
-          data = JSON.parse(responseText);
-        } catch (jsonError) {
-          console.error("❌ Invalid JSON response:", jsonError);
-          console.error("Response text:", responseText.substring(0, 500));
-          throw new Error("Invalid response format from server");
-        }
-      } catch (parseError) {
-        console.error("❌ Critical error during response parsing:", parseError);
-        // If parsing fails, try to provide more context
-        if (parseError instanceof Error && parseError.message.includes("already read")) {
-          throw new Error("Response body was consumed elsewhere - this is a race condition issue");
-        }
-        throw new Error("Failed to parse server response");
+      if (!fetchResult.success) {
+        throw new Error(fetchResult.error || "Unknown fetch error");
       }
+
+      const data = fetchResult.data;
+      const isResponseOk = fetchResult.status ? fetchResult.status < 400 : false;
 
       if (isResponseOk) {
         console.log("✅ REAL bet placed in MongoDB:", data);
@@ -1218,7 +1170,7 @@ const GamePlay = () => {
             if (totalPlaced > 0) {
               toast({
                 title: "✅ Bet Placed",
-                description: `₹${totalPlaced} placed across ${entries.length} Haruf bets.`,
+                description: `��${totalPlaced} placed across ${entries.length} Haruf bets.`,
                 className: "border-green-500 bg-green-50 text-green-900",
               });
 
