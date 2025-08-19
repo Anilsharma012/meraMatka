@@ -1,0 +1,95 @@
+/**
+ * Safely parse a response as JSON with proper error handling
+ * Prevents "Response body is already used" errors
+ */
+export async function safeParseResponse(response: Response): Promise<any> {
+  console.log("🔍 safeParseResponse called with response:", {
+    url: response.url,
+    type: response.type,
+    redirected: response.redirected,
+    bodyUsed: response.bodyUsed
+  });
+
+  // Store all response properties IMMEDIATELY to avoid body consumption issues
+  const bodyUsed = response.bodyUsed;
+  const contentType = response.headers.get("content-type");
+  const responseStatus = response.status;
+  const responseStatusText = response.statusText;
+
+  // Check if response body has already been consumed
+  if (bodyUsed) {
+    console.error("❌ Response body already consumed at entry");
+    return {
+      success: false,
+      message: "Response body was already read",
+      error: true,
+    };
+  }
+
+  try {
+    console.log("🔍 About to read response.text()");
+    // Always try to read as text first to avoid body consumption issues
+    const textResponse = await response.text();
+    console.log("✅ Successfully read response.text(), length:", textResponse.length);
+
+    // Check if we got any content
+    if (!textResponse) {
+      console.error("Empty response received");
+      return {
+        success: false,
+        message: "Empty response from server",
+        error: true,
+      };
+    }
+
+    // Check if it looks like JSON based on content type or content
+    const isLikelyJSON =
+      contentType?.includes("application/json") ||
+      textResponse.trim().startsWith("{") ||
+      textResponse.trim().startsWith("[");
+
+    if (!isLikelyJSON) {
+      console.error("Non-JSON response:", {
+        status: responseStatus,
+        statusText: responseStatusText,
+        contentType,
+        response: textResponse.substring(0, 500),
+      });
+
+      return {
+        success: false,
+        message: `Server error: ${responseStatus} ${responseStatusText}`,
+        error: true,
+      };
+    }
+
+    // Try to parse as JSON
+    try {
+      return JSON.parse(textResponse);
+    } catch (jsonError) {
+      console.error("❌ Failed to parse response JSON:", jsonError);
+      console.error("Response text:", textResponse.substring(0, 500));
+
+      return {
+        success: false,
+        message: "Invalid JSON response from server",
+        error: true,
+      };
+    }
+  } catch (readError) {
+    console.error("❌ Failed to read response:", readError);
+
+    return {
+      success: false,
+      message: "Failed to read response from server",
+      error: true,
+    };
+  }
+}
+
+/**
+ * Check if a parsed response indicates an error
+ */
+export function isResponseError(data: any): boolean {
+  return data?.error === true || data?.success === false;
+}
