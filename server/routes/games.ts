@@ -344,7 +344,7 @@ export const placeBet: RequestHandler = async (req, res) => {
 
     // Enhanced UTC time check for auto-close
     if (game.endTimeUTC && new Date() >= game.endTimeUTC) {
-      console.log("❌ Game past UTC end time:", game.endTimeUTC);
+      console.log("��� Game past UTC end time:", game.endTimeUTC);
       return res.status(403).json({
         success: false,
         message: "This game has ended and is no longer accepting bets",
@@ -1066,7 +1066,7 @@ export const declareResult: RequestHandler = async (req, res) => {
     });
 
     // ✅ UPSERT GameResult for Charts integration
-    const resultDate = today.toISOString().split("T")[0]; // YYYY-MM-DD format
+    const resultDateString = today.toISOString().split("T")[0]; // YYYY-MM-DD format
     const resultNumber =
       fallbackResult || jodiResult || harufResult || crossingResult;
 
@@ -1074,8 +1074,8 @@ export const declareResult: RequestHandler = async (req, res) => {
       {
         gameId: gameId,
         resultDate: {
-          $gte: new Date(resultDate + "T00:00:00.000Z"),
-          $lt: new Date(resultDate + "T23:59:59.999Z"),
+          $gte: new Date(resultDateString + "T00:00:00.000Z"),
+          $lt: new Date(resultDateString + "T23:59:59.999Z"),
         },
       },
       {
