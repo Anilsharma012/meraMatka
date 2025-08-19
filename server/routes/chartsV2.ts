@@ -5,6 +5,68 @@ import Result from "../models/Result";
 const router = express.Router();
 
 /**
+ * GET /api/charts/results
+ * Fetch results by IST date (for Charts page compatibility)
+ */
+router.get("/results", async (req, res) => {
+  try {
+    const { date } = req.query;
+
+    // Default to today in IST if no date provided
+    let targetDateIST = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    if (date && typeof date === 'string') {
+      targetDateIST = date;
+    }
+
+    console.log('📊 Charts API - Fetching results:', {
+      dateIST: targetDateIST,
+      timestamp: new Date().toISOString()
+    });
+
+    // Fetch results from dedicated Results collection
+    const results = await Result.find({
+      declaredDateIST: targetDateIST,
+      status: 'published'
+    })
+      .populate('gameId', 'name type')
+      .populate('declaredBy', 'fullName')
+      .sort({ declaredAtUTC: -1 }) // Newest first
+      .lean();
+
+    console.log(`📊 Found ${results.length} results for ${targetDateIST}`);
+
+    // Format results for Charts page
+    const formattedResults = results.map(result => ({
+      id: result._id,
+      name: result.marketName,
+      type: result.gameType,
+      winnerNumber: result.result?.jodi || result.result?.haruf || result.result?.crossing || 'N/A',
+      resultTime: result.declaredAtUTC,
+      icon: getGameIcon(result.marketName, result.gameType),
+      color: getGameColor(result.marketName, result.gameType)
+    }));
+
+    res.json({
+      success: true,
+      date: targetDateIST,
+      results: formattedResults,
+      total: formattedResults.length
+    });
+
+  } catch (error) {
+    console.error("❌ Charts API error:", error);
+
+    if (!res.headersSent) {
+      res.status(500).json({
+        success: false,
+        message: "Failed to fetch results",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  }
+});
+
+/**
  * GET /api/charts/results/by-date
  * Fetch results by IST date with proper boundary conversion
  */
