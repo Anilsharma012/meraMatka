@@ -515,6 +515,12 @@ const GamePlay = () => {
   };
 
   const handlePlaceBet = async () => {
+    // Prevent multiple simultaneous bet requests
+    if (placing) {
+      console.log("🚫 Bet already in progress, ignoring duplicate request");
+      return;
+    }
+
     if (!betData.betNumber || !betData.betAmount) {
       toast({
         variant: "destructive",
