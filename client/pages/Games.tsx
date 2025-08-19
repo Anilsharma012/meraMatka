@@ -98,16 +98,23 @@ const Games = () => {
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "open":
-        return "bg-green-500";
+  const getStatusColor = (game: Game) => {
+    // Determine actual status considering auto-close conditions
+    const isActuallyOpen = game.currentStatus === "open" &&
+                          game.acceptingBets !== false &&
+                          (!game.endTimeUTC || new Date() < new Date(game.endTimeUTC));
+
+    if (isActuallyOpen) {
+      return "bg-green-500";
+    }
+
+    switch (game.currentStatus) {
       case "closed":
-        return "bg-yellow-500";
+        return "bg-red-500";
       case "waiting":
-        return "bg-blue-500";
+        return "bg-yellow-500";
       case "result_declared":
-        return "bg-gray-500";
+        return "bg-blue-500";
       default:
         return "bg-gray-500";
     }
