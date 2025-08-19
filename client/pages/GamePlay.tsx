@@ -4,7 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import BASE_URL from "../src/config";
 import { useToast } from "@/hooks/use-toast";
 import { safeParseResponse } from "@/lib/responseUtils";
-import { simpleFetch } from "@/lib/simpleFetch";
+import { xhrFetch } from "@/lib/xhrFetch";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
