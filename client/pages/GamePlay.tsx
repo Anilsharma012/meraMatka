@@ -579,16 +579,22 @@ const GamePlay = () => {
 
       let data;
       try {
-        data = await safeParseResponse(response);
+        // Direct response parsing to avoid any potential body consumption issues
+        const responseText = await response.text();
+        if (!responseText) {
+          throw new Error("Empty response from server");
+        }
+
+        try {
+          data = JSON.parse(responseText);
+        } catch (jsonError) {
+          console.error("❌ Invalid JSON response:", jsonError);
+          console.error("Response text:", responseText.substring(0, 500));
+          throw new Error("Invalid response format from server");
+        }
       } catch (parseError) {
         console.error("❌ Critical error during response parsing:", parseError);
         throw new Error("Failed to parse server response");
-      }
-
-      // Check if response parsing failed
-      if (data.error) {
-        console.error("❌ Response parsing failed:", data.message);
-        throw new Error(data.message);
       }
 
       if (isResponseOk) {
