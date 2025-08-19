@@ -88,31 +88,30 @@ const GamePlay = () => {
 
   // Bet form state
   const [betData, setBetData] = useState({
-  betNumber: "",
-  betAmount: "",
-  harufPosition: "first" as "first" | "last",
-  crossingCombination: "",
-  crossingNumbers: "",
-  crossingAmount: "",
-  jodaCut: false,
-  generatedCrossings: [] as {
-    number: string;
-    amount: number;
-    type?: "crossing" | "joda_cut";
-  }[],
-  allCrossings: [] as { number: string; amount: number; type: "crossing" }[],
-  jodaCutCrossings: [] as {
-    number: string;
-    amount: number;
-    type: "joda_cut";
-  }[],
-  crossingTotal: 0,
-  jodaCutTotal: 0,
+    betNumber: "",
+    betAmount: "",
+    harufPosition: "first" as "first" | "last",
+    crossingCombination: "",
+    crossingNumbers: "",
+    crossingAmount: "",
+    jodaCut: false,
+    generatedCrossings: [] as {
+      number: string;
+      amount: number;
+      type?: "crossing" | "joda_cut";
+    }[],
+    allCrossings: [] as { number: string; amount: number; type: "crossing" }[],
+    jodaCutCrossings: [] as {
+      number: string;
+      amount: number;
+      type: "joda_cut";
+    }[],
+    crossingTotal: 0,
+    jodaCutTotal: 0,
 
-  // ✅ Add this line for Haruf inputs
-  harufBets: {} as Record<string, number>,
-});
-
+    // ✅ Add this line for Haruf inputs
+    harufBets: {} as Record<string, number>,
+  });
 
   // Hot numbers and trending bets (mock data)
   const [hotNumbers, setHotNumbers] = useState({
@@ -581,7 +580,9 @@ const GamePlay = () => {
       }
 
       const data = fetchResult.data;
-      const isResponseOk = fetchResult.status ? fetchResult.status < 400 : false;
+      const isResponseOk = fetchResult.status
+        ? fetchResult.status < 400
+        : false;
 
       if (isResponseOk) {
         console.log("✅ REAL bet placed in MongoDB:", data);
@@ -657,16 +658,29 @@ const GamePlay = () => {
 
       if (error.message.includes("timeout")) {
         errorTitle = "Request Timeout";
-        errorDescription = "The request took too long. Please check your connection and try again.";
-      } else if (error.message.includes("already read") || error.message.includes("body")) {
+        errorDescription =
+          "The request took too long. Please check your connection and try again.";
+      } else if (
+        error.message.includes("already read") ||
+        error.message.includes("body")
+      ) {
         errorTitle = "Technical Error";
-        errorDescription = "A technical issue occurred. Please refresh the page and try again.";
-      } else if (error.message.includes("network") || error.message.includes("fetch")) {
+        errorDescription =
+          "A technical issue occurred. Please refresh the page and try again.";
+      } else if (
+        error.message.includes("network") ||
+        error.message.includes("fetch")
+      ) {
         errorTitle = "Connection Error";
-        errorDescription = "Unable to connect to server. Please check your internet connection.";
-      } else if (error.message.includes("JSON") || error.message.includes("parse")) {
+        errorDescription =
+          "Unable to connect to server. Please check your internet connection.";
+      } else if (
+        error.message.includes("JSON") ||
+        error.message.includes("parse")
+      ) {
         errorTitle = "Server Error";
-        errorDescription = "The server sent an invalid response. Please try again.";
+        errorDescription =
+          "The server sent an invalid response. Please try again.";
       } else if (error.message) {
         // Use the specific error message from the server
         errorDescription = error.message;
@@ -790,18 +804,16 @@ const GamePlay = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Game Info & Timer */}
           {/* <div className="lg:col-span-1 space-y-6"> */}
-            {/* Wallet Balance */}
-            {/* <Card className="bg-card/90 backdrop-blur-sm border-border/50"> */}
-              {/* <CardHeader>
+          {/* Wallet Balance */}
+          {/* <Card className="bg-card/90 backdrop-blur-sm border-border/50"> */}
+          {/* <CardHeader>
                 <CardTitle className="text-foreground flex items-center gap-2">
                   <Wallet className="h-5 w-5" />
                   Wallet Balance (Real Data)
                 </CardTitle>
               </CardHeader> */}
 
-
-
-              {/* <CardContent>
+          {/* <CardContent>
                 <div className="text-center">
                   <p className="text-3xl font-bold text-matka-gold">
                     ���{wallet?.depositBalance.toLocaleString() || 0}
@@ -834,19 +846,17 @@ const GamePlay = () => {
                   </div>
                 </div>
               </CardContent> */}
-            {/* </Card> */}
+          {/* </Card> */}
 
-
-
-            {/* Game Timer */}
-            {/* <Card className="bg-card/90 backdrop-blur-sm border-border/50"> */}
-              {/* <CardHeader>
+          {/* Game Timer */}
+          {/* <Card className="bg-card/90 backdrop-blur-sm border-border/50"> */}
+          {/* <CardHeader>
                 <CardTitle className="text-foreground flex items-center gap-2">
                   <Clock className="h-5 w-5" />
                   Game Timer
                 </CardTitle>
               </CardHeader> */}
-              {/* <CardContent>
+          {/* <CardContent>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-matka-gold mb-2">
                     {String(countdown.hours).padStart(2, "0")}:
@@ -905,10 +915,10 @@ const GamePlay = () => {
                   </div>
                 </div>
               </CardContent> */}
-            {/* </Card> */}
+          {/* </Card> */}
 
-            {/* Hot Numbers */}
-            {/* <Card className="bg-card/90 backdrop-blur-sm border-border/50">
+          {/* Hot Numbers */}
+          {/* <Card className="bg-card/90 backdrop-blur-sm border-border/50">
               <CardHeader>
                 <CardTitle className="text-foreground flex items-center gap-2">
                   <Star className="h-5 w-5" />
@@ -963,9 +973,6 @@ const GamePlay = () => {
               </CardContent>
             </Card> */}
           {/* </div> */}
-
-
-
 
           {/* Game Play Area */}
           <div className="lg:col-span-2">
@@ -1041,189 +1048,202 @@ const GamePlay = () => {
                   </TabsContent>
 
                   {/* Haruf Game - Andar/Bahar Style */}
-              <TabsContent value="haruf">
-  <div className="bg-gray-800 rounded-2xl p-4">
-    <div className="grid grid-cols-2 gap-4">
-      {/* Andar Game */}
-      <div className="space-y-3">
-        <h3 className="text-white text-base font-medium text-center mb-3">
-          Andar Game
-        </h3>
-        {Array.from({ length: 10 }, (_, i) => {
-          const key = `A${i}`;
-          return (
-            <div key={key} className="flex gap-2 items-center">
-              <div className="w-10 h-9 bg-gray-600 rounded text-white font-medium text-sm flex items-center justify-center">
-                {key}
-              </div>
-              <input
-                type="number"
-                placeholder="00"
-                value={betData.harufBets?.[key] || ""}
-                onChange={(e) => {
-                  const updated = {
-                    ...betData.harufBets,
-                    [key]: parseInt(e.target.value || "0"),
-                  };
-                  setBetData((prev) => ({
-                    ...prev,
-                    harufBets: updated,
-                  }));
-                }}
-               className="w-full max-w-[100px] sm:max-w-full h-9 bg-gray-600 rounded text-white text-center font-medium text-sm border-none outline-none placeholder-gray-400 focus:bg-gray-500 transition-colors"
+                  <TabsContent value="haruf">
+                    <div className="bg-gray-800 rounded-2xl p-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        {/* Andar Game */}
+                        <div className="space-y-3">
+                          <h3 className="text-white text-base font-medium text-center mb-3">
+                            Andar Game
+                          </h3>
+                          {Array.from({ length: 10 }, (_, i) => {
+                            const key = `A${i}`;
+                            return (
+                              <div
+                                key={key}
+                                className="flex gap-2 items-center"
+                              >
+                                <div className="w-10 h-9 bg-gray-600 rounded text-white font-medium text-sm flex items-center justify-center">
+                                  {key}
+                                </div>
+                                <input
+                                  type="number"
+                                  placeholder="00"
+                                  value={betData.harufBets?.[key] || ""}
+                                  onChange={(e) => {
+                                    const updated = {
+                                      ...betData.harufBets,
+                                      [key]: parseInt(e.target.value || "0"),
+                                    };
+                                    setBetData((prev) => ({
+                                      ...prev,
+                                      harufBets: updated,
+                                    }));
+                                  }}
+                                  className="w-full max-w-[100px] sm:max-w-full h-9 bg-gray-600 rounded text-white text-center font-medium text-sm border-none outline-none placeholder-gray-400 focus:bg-gray-500 transition-colors"
+                                  max="5000"
+                                />
+                              </div>
+                            );
+                          })}
+                        </div>
 
-                max="5000"
-              />
-            </div>
-          );
-        })}
-      </div>
+                        {/* Bahar Game */}
+                        <div className="space-y-3">
+                          <h3 className="text-white text-base font-medium text-center mb-3">
+                            Bahar Game
+                          </h3>
+                          {Array.from({ length: 10 }, (_, i) => {
+                            const key = `B${i}`;
+                            return (
+                              <div
+                                key={key}
+                                className="flex gap-2 items-center"
+                              >
+                                <div className="w-10 h-9 bg-gray-600 rounded text-white font-medium text-sm flex items-center justify-center">
+                                  {key}
+                                </div>
+                                <input
+                                  type="number"
+                                  placeholder="00"
+                                  value={betData.harufBets?.[key] || ""}
+                                  onChange={(e) => {
+                                    const updated = {
+                                      ...betData.harufBets,
+                                      [key]: parseInt(e.target.value || "0"),
+                                    };
+                                    setBetData((prev) => ({
+                                      ...prev,
+                                      harufBets: updated,
+                                    }));
+                                  }}
+                                  className="w-full max-w-[100px] sm:max-w-full h-9 bg-gray-600 rounded text-white text-center font-medium text-sm border-none outline-none placeholder-gray-400 focus:bg-gray-500 transition-colors"
+                                  max="5000"
+                                />
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
 
-      {/* Bahar Game */}
-      <div className="space-y-3">
-        <h3 className="text-white text-base font-medium text-center mb-3">
-          Bahar Game
-        </h3>
-        {Array.from({ length: 10 }, (_, i) => {
-          const key = `B${i}`;
-          return (
-            <div key={key} className="flex gap-2 items-center">
-              <div className="w-10 h-9 bg-gray-600 rounded text-white font-medium text-sm flex items-center justify-center">
-                {key}
-              </div>
-              <input
-                type="number"
-                placeholder="00"
-                value={betData.harufBets?.[key] || ""}
-                onChange={(e) => {
-                  const updated = {
-                    ...betData.harufBets,
-                    [key]: parseInt(e.target.value || "0"),
-                  };
-                  setBetData((prev) => ({
-                    ...prev,
-                    harufBets: updated,
-                  }));
-                }}
-               className="w-full max-w-[100px] sm:max-w-full h-9 bg-gray-600 rounded text-white text-center font-medium text-sm border-none outline-none placeholder-gray-400 focus:bg-gray-500 transition-colors"
+                      {/* 🟡 Total & Submit */}
+                      <div className="mt-6 space-y-4">
+                        <div className="bg-gray-900 p-4 rounded-xl text-white text-lg font-semibold flex justify-between">
+                          <span>Total Bet Amount</span>
+                          <span>
+                            ₹
+                            {Object.values(betData.harufBets || {}).reduce(
+                              (sum, val) => sum + (parseInt(val as any) || 0),
+                              0,
+                            )}
+                          </span>
+                        </div>
 
-                max="5000"
-              />
-            </div>
-          );
-        })}
-      </div>
-    </div>
+                        <Button
+                          className="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold text-lg py-3 rounded-xl"
+                          onClick={async () => {
+                            const entries = Object.entries(
+                              betData.harufBets || {},
+                            ).filter(([_, val]) => val > 0);
 
-    {/* 🟡 Total & Submit */}
-    <div className="mt-6 space-y-4">
-      <div className="bg-gray-900 p-4 rounded-xl text-white text-lg font-semibold flex justify-between">
-        <span>Total Bet Amount</span>
-        <span>
-          ₹
-          {Object.values(betData.harufBets || {}).reduce(
-            (sum, val) => sum + (parseInt(val as any) || 0),
-            0
-          )}
-        </span>
-      </div>
+                            if (entries.length === 0) {
+                              alert(
+                                "कृपया कम से कम एक Haruf number पर पैसे लगाएं",
+                              );
+                              return;
+                            }
 
-      <Button
-        className="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold text-lg py-3 rounded-xl"
-        onClick={async () => {
-          const entries = Object.entries(betData.harufBets || {}).filter(
-            ([_, val]) => val > 0
-          );
+                            const token = localStorage.getItem("matka_token");
+                            if (!token) {
+                              alert("Login required");
+                              return;
+                            }
 
-          if (entries.length === 0) {
-            alert("कृपया कम से कम एक Haruf number पर पैसे लगाएं");
-            return;
-          }
+                            setPlacing(true);
+                            try {
+                              let totalPlaced = 0;
 
-          const token = localStorage.getItem("matka_token");
-          if (!token) {
-            alert("Login required");
-            return;
-          }
+                              for (const [number, amount] of entries) {
+                                const betPayload = {
+                                  gameId: game!._id,
+                                  betType: "haruf",
+                                  betNumber: number,
+                                  betAmount: amount,
+                                  harufPosition: number.startsWith("A")
+                                    ? "first"
+                                    : "last",
+                                };
 
-          setPlacing(true);
-          try {
-            let totalPlaced = 0;
+                                const res = await fetch(
+                                  `${BASE_URL}/api/games/place-bet`,
+                                  {
+                                    method: "POST",
+                                    headers: {
+                                      Authorization: `Bearer ${token}`,
+                                      "Content-Type": "application/json",
+                                    },
+                                    body: JSON.stringify(betPayload),
+                                  },
+                                );
 
-            for (const [number, amount] of entries) {
-              const betPayload = {
-                gameId: game!._id,
-                betType: "haruf",
-                betNumber: number,
-                betAmount: amount,
-                harufPosition: number.startsWith("A") ? "first" : "last",
-              };
+                                const data = await res.json();
+                                if (res.ok && !data.error) {
+                                  totalPlaced += amount;
+                                } else {
+                                  console.warn(
+                                    `❌ Failed for ${number}:`,
+                                    data.message,
+                                  );
+                                }
+                              }
 
-              const res = await fetch(`${BASE_URL}/api/games/place-bet`, {
-                method: "POST",
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify(betPayload),
-              });
+                              if (totalPlaced > 0) {
+                                toast({
+                                  title: "✅ Bet Placed",
+                                  description: `₹${totalPlaced} placed across ${entries.length} Haruf bets.`,
+                                  className:
+                                    "border-green-500 bg-green-50 text-green-900",
+                                });
 
-              const data = await res.json();
-              if (res.ok && !data.error) {
-                totalPlaced += amount;
-              } else {
-                console.warn(`❌ Failed for ${number}:`, data.message);
-              }
-            }
+                                await fetchWalletData();
 
-            if (totalPlaced > 0) {
-              toast({
-                title: "✅ Bet Placed",
-                description: `₹${totalPlaced} placed across ${entries.length} Haruf bets.`,
-                className: "border-green-500 bg-green-50 text-green-900",
-              });
-
-              await fetchWalletData();
-
-              setBetData((prev) => ({
-                ...prev,
-                harufBets: {},
-                betNumber: "",
-                betAmount: "",
-              }));
-            } else {
-              toast({
-                variant: "destructive",
-                title: "No Bets Placed",
-                description: "All bets failed or were invalid.",
-              });
-            }
-          } catch (err) {
-            console.error(err);
-            toast({
-              variant: "destructive",
-              title: "Server Error",
-              description: "Haruf bets failed.",
-            });
-          } finally {
-            setPlacing(false);
-          }
-        }}
-        disabled={
-          Object.values(betData.harufBets || {}).reduce(
-            (sum, val) => sum + (parseInt(val as any) || 0),
-            0
-          ) === 0
-        }
-      >
-        SUBMIT HARUF BET
-      </Button>
-    </div>
-  </div>
-</TabsContent>
-
-
-
+                                setBetData((prev) => ({
+                                  ...prev,
+                                  harufBets: {},
+                                  betNumber: "",
+                                  betAmount: "",
+                                }));
+                              } else {
+                                toast({
+                                  variant: "destructive",
+                                  title: "No Bets Placed",
+                                  description:
+                                    "All bets failed or were invalid.",
+                                });
+                              }
+                            } catch (err) {
+                              console.error(err);
+                              toast({
+                                variant: "destructive",
+                                title: "Server Error",
+                                description: "Haruf bets failed.",
+                              });
+                            } finally {
+                              setPlacing(false);
+                            }
+                          }}
+                          disabled={
+                            Object.values(betData.harufBets || {}).reduce(
+                              (sum, val) => sum + (parseInt(val as any) || 0),
+                              0,
+                            ) === 0
+                          }
+                        >
+                          SUBMIT HARUF BET
+                        </Button>
+                      </div>
+                    </div>
+                  </TabsContent>
 
                   {/* Crossing Game - Exact Screenshot Match */}
                   <TabsContent value="crossing">
@@ -1486,118 +1506,116 @@ const GamePlay = () => {
         </div>
 
         {/* Bet Modal */}
-       <Dialog
-  open={showBetModal}
-  onOpenChange={setShowBetModal}
->
-  <DialogContent className="bg-matka-dark border-border">
-    <DialogHeader>
-      <DialogTitle className="text-matka-gold">
-        Confirm Your Bet (Real Money)
-      </DialogTitle>
-    </DialogHeader>
+        <Dialog open={showBetModal} onOpenChange={setShowBetModal}>
+          <DialogContent className="bg-matka-dark border-border">
+            <DialogHeader>
+              <DialogTitle className="text-matka-gold">
+                Confirm Your Bet (Real Money)
+              </DialogTitle>
+            </DialogHeader>
 
-    <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-4 text-sm">
-        <div>
-          <Label className="text-muted-foreground">Bet Type</Label>
-          <p className="text-foreground font-semibold capitalize">
-            {selectedBetType}
-          </p>
-        </div>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <Label className="text-muted-foreground">Bet Type</Label>
+                  <p className="text-foreground font-semibold capitalize">
+                    {selectedBetType}
+                  </p>
+                </div>
 
-        <div>
-          <Label className="text-muted-foreground">Number</Label>
-          <p className="text-foreground font-semibold">
-            {selectedBetType === "haruf"
-              ? Object.entries(betData.harufBets || {})
-                  .filter(([_, v]) => v > 0)
-                  .map(([k, v]) => `${k}: ₹${v}`)
-                  .join(", ")
-              : betData.betNumber}
-          </p>
-        </div>
+                <div>
+                  <Label className="text-muted-foreground">Number</Label>
+                  <p className="text-foreground font-semibold">
+                    {selectedBetType === "haruf"
+                      ? Object.entries(betData.harufBets || {})
+                          .filter(([_, v]) => v > 0)
+                          .map(([k, v]) => `${k}: ₹${v}`)
+                          .join(", ")
+                      : betData.betNumber}
+                  </p>
+                </div>
 
-        <div>
-          <Label className="text-muted-foreground">Payout Rate</Label>
-          <p className="text-foreground font-semibold">
-            {selectedBetType === "jodi"
-              ? game.jodiPayout
-              : selectedBetType === "haruf"
-              ? game.harufPayout
-              : game.crossingPayout}
-            :1
-          </p>
-        </div>
+                <div>
+                  <Label className="text-muted-foreground">Payout Rate</Label>
+                  <p className="text-foreground font-semibold">
+                    {selectedBetType === "jodi"
+                      ? game.jodiPayout
+                      : selectedBetType === "haruf"
+                        ? game.harufPayout
+                        : game.crossingPayout}
+                    :1
+                  </p>
+                </div>
 
-        {selectedBetType === "haruf" && (
-          <div>
-            <Label className="text-muted-foreground">Position</Label>
-            <p className="text-foreground font-semibold capitalize">
-              Multiple
-            </p>
-          </div>
-        )}
-      </div>
+                {selectedBetType === "haruf" && (
+                  <div>
+                    <Label className="text-muted-foreground">Position</Label>
+                    <p className="text-foreground font-semibold capitalize">
+                      Multiple
+                    </p>
+                  </div>
+                )}
+              </div>
 
-      {/* 💸 Amount Field Only For jodi/crossing */}
-      {selectedBetType !== "haruf" && (
-        <div>
-          <Label className="text-foreground">Bet Amount (₹)</Label>
-          <Input
-            type="number"
-            placeholder={`Min: ₹${game.minBet}, Max: ��${game.maxBet}`}
-            value={betData.betAmount}
-            onChange={(e) =>
-              setBetData((prev) => ({
-                ...prev,
-                betAmount: e.target.value,
-              }))
-            }
-            className="mt-2"
-          />
-        </div>
-      )}
+              {/* 💸 Amount Field Only For jodi/crossing */}
+              {selectedBetType !== "haruf" && (
+                <div>
+                  <Label className="text-foreground">Bet Amount (₹)</Label>
+                  <Input
+                    type="number"
+                    placeholder={`Min: ₹${game.minBet}, Max: ��${game.maxBet}`}
+                    value={betData.betAmount}
+                    onChange={(e) =>
+                      setBetData((prev) => ({
+                        ...prev,
+                        betAmount: e.target.value,
+                      }))
+                    }
+                    className="mt-2"
+                  />
+                </div>
+              )}
 
-      {/* 🎯 Potential Winning */}
-      {betData.betAmount && selectedBetType !== "haruf" && (
-        <div className="p-3 bg-matka-gold/10 rounded border border-matka-gold/30">
-          <p className="text-sm text-muted-foreground">Potential Winning</p>
-          <p className="text-xl font-bold text-matka-gold">
-            ₹
-            {(
-              parseFloat(betData.betAmount || "0") *
-              (selectedBetType === "jodi"
-                ? game.jodiPayout
-                : game.crossingPayout)
-            ).toLocaleString()}
-          </p>
-        </div>
-      )}
-    </div>
+              {/* 🎯 Potential Winning */}
+              {betData.betAmount && selectedBetType !== "haruf" && (
+                <div className="p-3 bg-matka-gold/10 rounded border border-matka-gold/30">
+                  <p className="text-sm text-muted-foreground">
+                    Potential Winning
+                  </p>
+                  <p className="text-xl font-bold text-matka-gold">
+                    ₹
+                    {(
+                      parseFloat(betData.betAmount || "0") *
+                      (selectedBetType === "jodi"
+                        ? game.jodiPayout
+                        : game.crossingPayout)
+                    ).toLocaleString()}
+                  </p>
+                </div>
+              )}
+            </div>
 
-    <DialogFooter>
-      <Button
-        variant="outline"
-        onClick={() => setShowBetModal(false)}
-        className="border-border text-foreground"
-      >
-        Cancel
-      </Button>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setShowBetModal(false)}
+                className="border-border text-foreground"
+              >
+                Cancel
+              </Button>
 
-      {selectedBetType !== "haruf" && (
-        <Button
-          onClick={handlePlaceBet}
-          disabled={placing || !betData.betAmount}
-          className="bg-matka-gold text-matka-dark hover:bg-matka-gold-dark"
-        >
-          {placing ? "Placing..." : "Place Bet"}
-        </Button>
-      )}
-    </DialogFooter>
-  </DialogContent>
-</Dialog>
-
+              {selectedBetType !== "haruf" && (
+                <Button
+                  onClick={handlePlaceBet}
+                  disabled={placing || !betData.betAmount}
+                  className="bg-matka-gold text-matka-dark hover:bg-matka-gold-dark"
+                >
+                  {placing ? "Placing..." : "Place Bet"}
+                </Button>
+              )}
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

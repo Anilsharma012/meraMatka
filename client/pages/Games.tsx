@@ -100,9 +100,10 @@ const Games = () => {
 
   const getStatusColor = (game: Game) => {
     // Determine actual status considering auto-close conditions
-    const isActuallyOpen = game.currentStatus === "open" &&
-                          game.acceptingBets !== false &&
-                          (!game.endTimeUTC || new Date() < new Date(game.endTimeUTC));
+    const isActuallyOpen =
+      game.currentStatus === "open" &&
+      game.acceptingBets !== false &&
+      (!game.endTimeUTC || new Date() < new Date(game.endTimeUTC));
 
     if (isActuallyOpen) {
       return "bg-green-500";
@@ -280,9 +281,7 @@ const Games = () => {
                                           {game.type} Game
                                         </p>
                                       </div>
-                                      <Badge
-                                        className={getStatusColor(game)}
-                                      >
+                                      <Badge className={getStatusColor(game)}>
                                         {getStatusText(game)}
                                       </Badge>
                                     </div>
@@ -340,8 +339,9 @@ const Games = () => {
                                     >
                                       <Play className="h-3 w-3 mr-1" />
                                       {game.currentStatus === "open" &&
-                                       game.acceptingBets !== false &&
-                                       (!game.endTimeUTC || new Date() < new Date(game.endTimeUTC))
+                                      game.acceptingBets !== false &&
+                                      (!game.endTimeUTC ||
+                                        new Date() < new Date(game.endTimeUTC))
                                         ? "Play Now"
                                         : "Not Available"}
                                     </Button>
@@ -401,30 +401,40 @@ const Games = () => {
                           </Badge>
                         </div>
                         <div className="space-y-1">
-                        <div className="flex justify-between">
-  <span className="text-muted-foreground text-xs">Jodi:</span>
-  <span className="text-foreground font-bold">
-    {result?.jodiResult || result?.declaredResult || "-"}
-  </span>
-</div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground text-xs">
+                              Jodi:
+                            </span>
+                            <span className="text-foreground font-bold">
+                              {result?.jodiResult ||
+                                result?.declaredResult ||
+                                "-"}
+                            </span>
+                          </div>
 
                           {result.harufResult && (
-                          <div className="flex justify-between">
-                          <span className="text-muted-foreground text-xs">Haruf:</span>
-                          <span className="text-foreground font-bold">
-                            {result?.harufResult || result?.declaredResult || "-"}
-                          </span>
-                        </div>
-                        
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground text-xs">
+                                Haruf:
+                              </span>
+                              <span className="text-foreground font-bold">
+                                {result?.harufResult ||
+                                  result?.declaredResult ||
+                                  "-"}
+                              </span>
+                            </div>
                           )}
                           {result.crossingResult && (
                             <div className="flex justify-between">
-                            <span className="text-muted-foreground text-xs">Crossing:</span>
-                            <span className="text-foreground font-bold">
-                              {result?.crossingResult || result?.declaredResult || "-"}
-                            </span>
-                          </div>
-                          
+                              <span className="text-muted-foreground text-xs">
+                                Crossing:
+                              </span>
+                              <span className="text-foreground font-bold">
+                                {result?.crossingResult ||
+                                  result?.declaredResult ||
+                                  "-"}
+                              </span>
+                            </div>
                           )}
                         </div>
                       </div>

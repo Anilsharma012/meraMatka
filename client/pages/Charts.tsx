@@ -46,11 +46,15 @@ const Charts = () => {
     new Date().toISOString().split("T")[0],
   );
   const [gameResults, setGameResults] = useState<GameResult[]>([]);
-  const [historicalResults, setHistoricalResults] = useState<HistoricalResult[]>([]);
+  const [historicalResults, setHistoricalResults] = useState<
+    HistoricalResult[]
+  >([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [refreshing, setRefreshing] = useState(false);
-  const [currentRequest, setCurrentRequest] = useState<AbortController | null>(null);
+  const [currentRequest, setCurrentRequest] = useState<AbortController | null>(
+    null,
+  );
 
   // Fetch results for selected date
   const fetchResults = async (date: string) => {
@@ -67,18 +71,18 @@ const Charts = () => {
       setError("");
 
       console.log(`📊 Fetching results for date: ${date}`);
-      console.log('📊 Using BASE_URL:', BASE_URL || '(same-origin)');
+      console.log("📊 Using BASE_URL:", BASE_URL || "(same-origin)");
 
       const url = `${BASE_URL}/api/charts/results?date=${date}`;
-      console.log('📊 Request URL:', url);
+      console.log("📊 Request URL:", url);
 
       const response = await fetch(url, {
         signal: abortController.signal,
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        mode: 'cors',
-        credentials: 'include'
+        mode: "cors",
+        credentials: "include",
       });
 
       // Check if request was aborted
@@ -107,8 +111,8 @@ const Charts = () => {
       }
     } catch (err: any) {
       // Don't show error if request was aborted
-      if (err.name === 'AbortError') {
-        console.log('Request was aborted');
+      if (err.name === "AbortError") {
+        console.log("Request was aborted");
         return;
       }
 
@@ -123,32 +127,34 @@ const Charts = () => {
   // Fetch historical results
   const fetchHistory = async () => {
     try {
-      console.log('📊 Fetching historical results...');
-      console.log('📊 Using BASE_URL:', BASE_URL || '(same-origin)');
+      console.log("📊 Fetching historical results...");
+      console.log("📊 Using BASE_URL:", BASE_URL || "(same-origin)");
 
       const url = `${BASE_URL}/api/charts/history?days=7`;
-      console.log('📊 Request URL:', url);
+      console.log("📊 Request URL:", url);
 
       const response = await fetch(url, {
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        mode: 'cors',
-        credentials: 'include'
+        mode: "cors",
+        credentials: "include",
       });
 
-      console.log('📊 Response status:', response.status);
-      console.log('📊 Response ok:', response.ok);
+      console.log("📊 Response status:", response.status);
+      console.log("📊 Response ok:", response.ok);
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+        throw new Error(
+          `HTTP error! status: ${response.status} - ${response.statusText}`,
+        );
       }
 
       // Use safe response parsing to avoid body consumption issues
       const data = await safeParseResponse(response);
 
       if (data.error) {
-        console.error('Failed to load history:', data.message);
+        console.error("Failed to load history:", data.message);
         return;
       }
 
@@ -156,14 +162,14 @@ const Charts = () => {
         setHistoricalResults(data.history);
         console.log(`📊 Loaded history for ${data.totalDays} days`);
       } else {
-        console.warn('📊 API returned success: false');
+        console.warn("📊 API returned success: false");
       }
     } catch (err: any) {
       console.error("Error fetching history:", err);
       console.error("Error details:", {
         name: err.name,
         message: err.message,
-        stack: err.stack
+        stack: err.stack,
       });
       // Don't set error state for history as it's not critical
       // Set empty array as fallback
@@ -180,19 +186,22 @@ const Charts = () => {
     // Test basic API connectivity first
     const testAPI = async () => {
       try {
-        console.log('🔧 Testing API connectivity...');
+        console.log("🔧 Testing API connectivity...");
         const testResponse = await fetch(`${BASE_URL}/api/ping`, {
-          headers: { 'Content-Type': 'application/json' },
-          mode: 'cors',
-          credentials: 'include'
+          headers: { "Content-Type": "application/json" },
+          mode: "cors",
+          credentials: "include",
         });
-        console.log('🔧 API ping test:', testResponse.ok ? 'SUCCESS' : 'FAILED');
+        console.log(
+          "🔧 API ping test:",
+          testResponse.ok ? "SUCCESS" : "FAILED",
+        );
         if (testResponse.ok) {
           const testData = await testResponse.json();
-          console.log('🔧 API ping response:', testData);
+          console.log("🔧 API ping response:", testData);
         }
       } catch (err) {
-        console.error('🔧 API ping failed:', err);
+        console.error("🔧 API ping failed:", err);
       }
     };
 
@@ -217,10 +226,7 @@ const Charts = () => {
   // Refresh data
   const handleRefresh = async () => {
     setRefreshing(true);
-    await Promise.all([
-      fetchResults(selectedDate),
-      fetchHistory()
-    ]);
+    await Promise.all([fetchResults(selectedDate), fetchHistory()]);
     setRefreshing(false);
   };
 
@@ -249,7 +255,9 @@ const Charts = () => {
                 size="sm"
                 className="border-border text-foreground hover:bg-muted"
               >
-                <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+                <RefreshCw
+                  className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`}
+                />
               </Button>
             </div>
           </div>
@@ -264,7 +272,7 @@ const Charts = () => {
               Select Date to see the winners
             </p>
           </div>
-          
+
           <div className="flex justify-center">
             <div className="relative">
               <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -283,7 +291,9 @@ const Charts = () => {
         {loading && (
           <div className="flex justify-center items-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-matka-gold" />
-            <span className="ml-2 text-muted-foreground">Loading results...</span>
+            <span className="ml-2 text-muted-foreground">
+              Loading results...
+            </span>
           </div>
         )}
 
@@ -310,7 +320,8 @@ const Charts = () => {
               </Button>
             </div>
             <p className="text-muted-foreground text-sm mt-4">
-              If API is not working, use the admin panel to declare results directly
+              If API is not working, use the admin panel to declare results
+              directly
             </p>
           </div>
         )}
@@ -321,7 +332,8 @@ const Charts = () => {
             {gameResults.length > 0 ? (
               <div className="space-y-4 mb-8">
                 <h2 className="text-foreground text-xl font-bold text-center">
-                  Results for {new Date(selectedDate).toLocaleDateString('en-IN')}
+                  Results for{" "}
+                  {new Date(selectedDate).toLocaleDateString("en-IN")}
                 </h2>
                 {gameResults.map((game) => (
                   <Card
@@ -343,7 +355,10 @@ const Charts = () => {
                             </p>
                             {game.resultTime && (
                               <p className="text-muted-foreground text-xs">
-                                Declared at: {new Date(game.resultTime).toLocaleTimeString('en-IN')}
+                                Declared at:{" "}
+                                {new Date(game.resultTime).toLocaleTimeString(
+                                  "en-IN",
+                                )}
                               </p>
                             )}
                           </div>
@@ -361,12 +376,17 @@ const Charts = () => {
             ) : (
               <div className="text-center py-12">
                 <div className="text-6xl mb-4">🎯</div>
-                <h3 className="text-foreground text-xl font-bold mb-2">No Results Found</h3>
+                <h3 className="text-foreground text-xl font-bold mb-2">
+                  No Results Found
+                </h3>
                 <p className="text-muted-foreground">
-                  No game results were declared on {new Date(selectedDate).toLocaleDateString('en-IN')}
+                  No game results were declared on{" "}
+                  {new Date(selectedDate).toLocaleDateString("en-IN")}
                 </p>
-                <Button 
-                  onClick={() => setSelectedDate(new Date().toISOString().split("T")[0])}
+                <Button
+                  onClick={() =>
+                    setSelectedDate(new Date().toISOString().split("T")[0])
+                  }
                   className="mt-4"
                   variant="outline"
                 >
@@ -398,7 +418,10 @@ const Charts = () => {
                       <div className="flex gap-3 flex-wrap">
                         {dayResult.results.slice(0, 3).map((result, idx) => (
                           <span key={idx} className="text-foreground text-sm">
-                            {result.gameName}: <span className="text-matka-gold font-bold">{result.result}</span>
+                            {result.gameName}:{" "}
+                            <span className="text-matka-gold font-bold">
+                              {result.result}
+                            </span>
                           </span>
                         ))}
                         {dayResult.results.length > 3 && (

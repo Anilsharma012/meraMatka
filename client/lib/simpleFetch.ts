@@ -18,15 +18,10 @@ interface SimpleFetchResponse {
 }
 
 export async function simpleFetch(
-  url: string, 
-  options: SimpleFetchOptions = {}
+  url: string,
+  options: SimpleFetchOptions = {},
 ): Promise<SimpleFetchResponse> {
-  const {
-    method = 'GET',
-    headers = {},
-    body,
-    timeout = 15000,
-  } = options;
+  const { method = "GET", headers = {}, body, timeout = 15000 } = options;
 
   let timeoutId: NodeJS.Timeout;
   let controller: AbortController;
@@ -45,7 +40,7 @@ export async function simpleFetch(
     const response = await fetch(url, {
       method,
       headers: {
-        'Cache-Control': 'no-cache',
+        "Cache-Control": "no-cache",
         ...headers,
       },
       body,
@@ -59,43 +54,49 @@ export async function simpleFetch(
     const status = response.status;
     const statusText = response.statusText;
     const ok = response.ok;
-    
+
     console.log(`📡 Response received: ${status} ${statusText}`);
 
     // Try different methods to read response body
     let data: any = null;
-    let responseText = '';
+    let responseText = "";
 
     try {
       // First try to read as JSON directly (most efficient)
-      if (response.headers.get('content-type')?.includes('application/json')) {
+      if (response.headers.get("content-type")?.includes("application/json")) {
         try {
           data = await response.json();
-          console.log('✅ Successfully read response as JSON');
+          console.log("✅ Successfully read response as JSON");
         } catch (jsonError) {
-          console.log('⚠️ JSON parsing failed, trying text method');
+          console.log("⚠️ JSON parsing failed, trying text method");
           // Response body might be consumed, create a new request
-          throw new Error('JSON parsing failed, response body consumed');
+          throw new Error("JSON parsing failed, response body consumed");
         }
       } else {
         // Read as text for non-JSON responses
         responseText = await response.text();
-        console.log('✅ Successfully read response as text, length:', responseText.length);
+        console.log(
+          "✅ Successfully read response as text, length:",
+          responseText.length,
+        );
 
         if (responseText.trim()) {
           try {
             data = JSON.parse(responseText);
           } catch (jsonError) {
-            console.log('⚠️ Response is not JSON:', responseText.substring(0, 100));
+            console.log(
+              "⚠️ Response is not JSON:",
+              responseText.substring(0, 100),
+            );
             data = { message: responseText };
           }
         }
       }
     } catch (bodyError) {
-      console.error('❌ Failed to read response body:', bodyError);
+      console.error("❌ Failed to read response body:", bodyError);
       return {
         success: false,
-        error: 'Could not read response from server',
+        error: "Could not read response from server",
         status,
       };
     }
@@ -105,23 +106,22 @@ export async function simpleFetch(
       data,
       status,
     };
-
   } catch (fetchError: any) {
     // Clear timeout if it exists
     if (timeoutId) clearTimeout(timeoutId);
-    
-    console.error('❌ Fetch error:', fetchError);
-    
-    if (fetchError.name === 'AbortError') {
+
+    console.error("❌ Fetch error:", fetchError);
+
+    if (fetchError.name === "AbortError") {
       return {
         success: false,
-        error: 'Request timed out',
+        error: "Request timed out",
       };
     }
-    
+
     return {
       success: false,
-      error: 'Network error',
+      error: "Network error",
     };
   }
 }

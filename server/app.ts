@@ -125,7 +125,10 @@ app.use(
       }
 
       // Allow Builder.io domains
-      if (origin.includes(".projects.builder.codes") || origin.includes(".builder.io")) {
+      if (
+        origin.includes(".projects.builder.codes") ||
+        origin.includes(".builder.io")
+      ) {
         console.log("✅ CORS ALLOWED (builder.io):", origin);
         callback(null, true);
         return;

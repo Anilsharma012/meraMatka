@@ -7,7 +7,7 @@ export async function safeParseResponse(response: Response): Promise<any> {
     url: response.url,
     type: response.type,
     redirected: response.redirected,
-    bodyUsed: response.bodyUsed
+    bodyUsed: response.bodyUsed,
   });
 
   // Store response properties to avoid body consumption issues
@@ -19,7 +19,10 @@ export async function safeParseResponse(response: Response): Promise<any> {
     console.log("🔍 About to read response.text()");
     // Always try to read as text first to avoid body consumption issues
     const textResponse = await response.text();
-    console.log("✅ Successfully read response.text(), length:", textResponse.length);
+    console.log(
+      "✅ Successfully read response.text(), length:",
+      textResponse.length,
+    );
 
     // Check if we got any content
     if (!textResponse) {
@@ -69,8 +72,12 @@ export async function safeParseResponse(response: Response): Promise<any> {
     console.error("❌ Failed to read response:", readError);
 
     // Check if this is a "body already read" error
-    const errorMessage = readError instanceof Error ? readError.message : String(readError);
-    if (errorMessage.includes("already read") || errorMessage.includes("body used")) {
+    const errorMessage =
+      readError instanceof Error ? readError.message : String(readError);
+    if (
+      errorMessage.includes("already read") ||
+      errorMessage.includes("body used")
+    ) {
       console.error("❌ Response body was already consumed");
       return {
         success: false,

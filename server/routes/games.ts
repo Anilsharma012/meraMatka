@@ -41,7 +41,11 @@ export const getAllGames: RequestHandler = async (req, res) => {
         // Check against UTC times if available
         if (game.endTimeUTC && now >= game.endTimeUTC) {
           status = "closed";
-        } else if (game.startTimeUTC && now >= game.startTimeUTC && now < game.endTimeUTC!) {
+        } else if (
+          game.startTimeUTC &&
+          now >= game.startTimeUTC &&
+          now < game.endTimeUTC!
+        ) {
           status = "open";
         } else {
           status = "waiting";
@@ -788,11 +792,9 @@ export const forceGameStatus: RequestHandler = async (req, res) => {
       updateFields.endTimeUTC = new Date(Date.now() + 24 * 60 * 60 * 1000);
     }
 
-    const updatedGame = await Game.findByIdAndUpdate(
-      gameId,
-      updateFields,
-      { new: true },
-    );
+    const updatedGame = await Game.findByIdAndUpdate(gameId, updateFields, {
+      new: true,
+    });
 
     console.log(`✅ Game ${game.name} status forced to: ${forceStatus}`);
 

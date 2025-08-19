@@ -19,20 +19,22 @@ interface RobustFetchResponse {
 }
 
 export async function robustFetch(
-  url: string, 
-  options: RobustFetchOptions = {}
+  url: string,
+  options: RobustFetchOptions = {},
 ): Promise<RobustFetchResponse> {
   const {
-    method = 'GET',
+    method = "GET",
     headers = {},
     body,
     timeout = 15000,
-    retries = 1
+    retries = 1,
   } = options;
 
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
-      console.log(`🔄 robustFetch attempt ${attempt + 1}/${retries + 1} for ${url}`);
+      console.log(
+        `🔄 robustFetch attempt ${attempt + 1}/${retries + 1} for ${url}`,
+      );
 
       // Create AbortController for timeout
       const controller = new AbortController();
@@ -45,13 +47,13 @@ export async function robustFetch(
       const response = await fetch(url, {
         method,
         headers: {
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache',
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
           ...headers,
         },
         body,
         signal: controller.signal,
-        cache: 'no-cache',
+        cache: "no-cache",
       });
 
       // Clear timeout immediately
@@ -75,14 +77,14 @@ export async function robustFetch(
       try {
         responseText = await response.text();
       } catch (readError) {
-        console.error('❌ Failed to read response text:', readError);
+        console.error("❌ Failed to read response text:", readError);
         if (attempt < retries) {
           console.log(`🔄 Retrying due to read error...`);
           continue;
         }
         return {
           success: false,
-          error: 'Failed to read response from server',
+          error: "Failed to read response from server",
           status: responseStatus,
         };
       }
@@ -92,15 +94,15 @@ export async function robustFetch(
       try {
         data = responseText ? JSON.parse(responseText) : {};
       } catch (jsonError) {
-        console.error('❌ Failed to parse JSON:', jsonError);
-        console.error('Response text:', responseText.substring(0, 500));
+        console.error("❌ Failed to parse JSON:", jsonError);
+        console.error("Response text:", responseText.substring(0, 500));
         if (attempt < retries) {
           console.log(`🔄 Retrying due to JSON parse error...`);
           continue;
         }
         return {
           success: false,
-          error: 'Invalid JSON response from server',
+          error: "Invalid JSON response from server",
           status: responseStatus,
         };
       }
@@ -111,37 +113,38 @@ export async function robustFetch(
         data,
         status: responseStatus,
       };
-
     } catch (fetchError: any) {
       console.error(`❌ Fetch error on attempt ${attempt + 1}:`, fetchError);
-      
+
       // Handle different types of errors
-      if (fetchError.name === 'AbortError') {
+      if (fetchError.name === "AbortError") {
         if (attempt < retries) {
           console.log(`🔄 Retrying due to timeout...`);
           continue;
         }
         return {
           success: false,
-          error: 'Request timeout - please try again',
+          error: "Request timeout - please try again",
         };
       }
-      
+
       if (attempt < retries) {
         console.log(`🔄 Retrying due to network error...`);
-        await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1))); // Exponential backoff
+        await new Promise((resolve) =>
+          setTimeout(resolve, 1000 * (attempt + 1)),
+        ); // Exponential backoff
         continue;
       }
-      
+
       return {
         success: false,
-        error: 'Network error - please check your connection',
+        error: "Network error - please check your connection",
       };
     }
   }
 
   return {
     success: false,
-    error: 'Max retries exceeded',
+    error: "Max retries exceeded",
   };
 }
