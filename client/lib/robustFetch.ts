@@ -57,20 +57,23 @@ export async function robustFetch(
       // Clear timeout immediately
       clearTimeout(timeoutId);
 
-      // Clone response immediately to prevent body consumption issues
-      const responseClone = response.clone();
-      
+      // Store response metadata before reading body
+      const responseStatus = response.status;
+      const responseStatusText = response.statusText;
+      const responseOk = response.ok;
+      const responseUrl = response.url;
+
       console.log(`📡 Response received:`, {
-        status: response.status,
-        statusText: response.statusText,
-        ok: response.ok,
-        url: response.url,
+        status: responseStatus,
+        statusText: responseStatusText,
+        ok: responseOk,
+        url: responseUrl,
       });
 
-      // Read response text from clone
+      // Read response text directly (no cloning)
       let responseText: string;
       try {
-        responseText = await responseClone.text();
+        responseText = await response.text();
       } catch (readError) {
         console.error('❌ Failed to read response text:', readError);
         if (attempt < retries) {
@@ -80,7 +83,7 @@ export async function robustFetch(
         return {
           success: false,
           error: 'Failed to read response from server',
-          status: response.status,
+          status: responseStatus,
         };
       }
 
