@@ -144,15 +144,12 @@ const Charts = () => {
         throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
       }
 
-      // Clone response to avoid "body stream already read" error
-      const responseClone = response.clone();
+      // Use safe response parsing to avoid body consumption issues
+      const data = await safeParseResponse(response);
 
-      let data: HistoryResponse;
-      try {
-        data = await response.json();
-      } catch (jsonError) {
-        console.warn('Failed to parse JSON from original response, trying clone:', jsonError);
-        data = await responseClone.json();
+      if (data.error) {
+        console.error('Failed to load history:', data.message);
+        return;
       }
 
       if (data.success) {
