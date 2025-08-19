@@ -113,8 +113,23 @@ const Games = () => {
     }
   };
 
-  const getStatusText = (status: string) => {
-    switch (status) {
+  const getStatusText = (game: Game) => {
+    // Check if game was auto-closed or manually closed
+    if (game.acceptingBets === false) {
+      return "Betting Closed";
+    }
+
+    // Check if past end time UTC
+    if (game.endTimeUTC) {
+      const now = new Date();
+      const endTimeUTC = new Date(game.endTimeUTC);
+      if (now >= endTimeUTC) {
+        return "Betting Closed";
+      }
+    }
+
+    // Use the current status
+    switch (game.currentStatus) {
       case "open":
         return "Betting Open";
       case "closed":
@@ -124,7 +139,7 @@ const Games = () => {
       case "result_declared":
         return "Result Declared";
       default:
-        return status;
+        return game.currentStatus;
     }
   };
 
