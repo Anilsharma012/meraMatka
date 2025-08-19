@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Calendar, ArrowLeft, Loader2, RefreshCw } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import BASE_URL from "../src/config";
+import { safeParseResponse } from "@/lib/responseUtils";
 
 interface GameResult {
   id: string;
