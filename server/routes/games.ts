@@ -20,7 +20,7 @@ export const getAllGames: RequestHandler = async (req, res) => {
       .select("-createdBy -__v")
       .sort({ startTime: 1 });
 
-    // Add current game status based on time or forced status
+    // Use the currentStatus field maintained by auto-close service
     const gamesWithStatus = games.map((game) => {
       // If admin has forced a status, use that
       if (game.forcedStatus && game.isActive) {
@@ -30,71 +30,25 @@ export const getAllGames: RequestHandler = async (req, res) => {
         };
       }
 
-      // Otherwise calculate based on time with proper cross-day handling
-      const now = new Date();
-      const currentTime = now.toTimeString().slice(0, 5); // HH:mm format
+      // Use the currentStatus field maintained by the auto-close service
+      // If no currentStatus is set, derive it from current time as fallback
+      let status = game.currentStatus || "waiting";
 
-      // Helper function to convert HH:mm to minutes for comparison
-      const timeToMinutes = (time: string) => {
-        const [hours, minutes] = time.split(":").map(Number);
-        return hours * 60 + minutes;
-      };
+      // Fallback logic if currentStatus is not set (for backward compatibility)
+      if (!game.currentStatus && game.isActive) {
+        const now = new Date();
 
-      const currentMinutes = timeToMinutes(currentTime);
-      const startMinutes = timeToMinutes(game.startTime);
-      const endMinutes = timeToMinutes(game.endTime);
-      const resultMinutes = timeToMinutes(game.resultTime);
-
-      let status = "waiting";
-      if (game.isActive) {
-        // Handle cross-day scenarios (when end time is next day)
-        let isGameOpen = false;
-        let isGameClosed = false;
-        let isResultTime = false;
-
-        if (endMinutes > startMinutes) {
-          // Same day game (e.g., 08:00 to 15:30) OR game with next-day result
-          isGameOpen =
-            currentMinutes >= startMinutes && currentMinutes < endMinutes;
-
-          // Check if result time is next day (result < start means next day)
-          if (resultMinutes < startMinutes) {
-            // Result time is next day (e.g., start: 08:00, end: 23:10, result: 00:30 next day)
-            isGameClosed = currentMinutes >= endMinutes; // From end time until day ends
-            isResultTime = currentMinutes <= resultMinutes; // From day start until result time
-          } else {
-            // Result time is same day (normal case)
-            isGameClosed =
-              currentMinutes >= endMinutes && currentMinutes < resultMinutes;
-            isResultTime = currentMinutes >= resultMinutes;
-          }
-        } else {
-          // Cross-day game (e.g., 08:00 to 03:30 next day)
-          isGameOpen =
-            currentMinutes >= startMinutes || currentMinutes < endMinutes;
-
-          if (resultMinutes > endMinutes) {
-            // Result is same day as end time
-            isGameClosed =
-              currentMinutes >= endMinutes && currentMinutes < resultMinutes;
-            isResultTime =
-              currentMinutes >= resultMinutes && currentMinutes < startMinutes;
-          } else {
-            // Result is next day after end time
-            isGameClosed =
-              (currentMinutes >= endMinutes && currentMinutes < 1440) ||
-              (currentMinutes >= 0 && currentMinutes < resultMinutes);
-            isResultTime =
-              currentMinutes >= resultMinutes && currentMinutes < startMinutes;
-          }
-        }
-
-        if (isGameOpen) {
-          status = "open";
-        } else if (isGameClosed) {
+        // Check against UTC times if available
+        if (game.endTimeUTC && now >= game.endTimeUTC) {
           status = "closed";
-        } else if (isResultTime) {
-          status = "result_declared";
+        } else if (
+          game.startTimeUTC &&
+          now >= game.startTimeUTC &&
+          now < game.endTimeUTC!
+        ) {
+          status = "open";
+        } else {
+          status = "waiting";
         }
       }
 
@@ -344,7 +298,7 @@ export const placeBet: RequestHandler = async (req, res) => {
 
     // Enhanced UTC time check for auto-close
     if (game.endTimeUTC && new Date() >= game.endTimeUTC) {
-      console.log("❌ Game past UTC end time:", game.endTimeUTC);
+      console.log("��� Game past UTC end time:", game.endTimeUTC);
       return res.status(403).json({
         success: false,
         message: "This game has ended and is no longer accepting bets",
@@ -825,15 +779,22 @@ export const forceGameStatus: RequestHandler = async (req, res) => {
       return;
     }
 
-    // Store the forced status in a custom field
-    const updatedGame = await Game.findByIdAndUpdate(
-      gameId,
-      {
-        forcedStatus: forceStatus,
-        lastStatusChange: new Date(),
-      },
-      { new: true },
-    );
+    // Store the forced status and update related fields
+    const updateFields: any = {
+      forcedStatus: forceStatus,
+      lastStatusChange: new Date(),
+    };
+
+    // If forcing to open, also set acceptingBets to true and extend endTimeUTC
+    if (forceStatus === "open") {
+      updateFields.acceptingBets = true;
+      // Set endTimeUTC to 24 hours from now to prevent auto-close
+      updateFields.endTimeUTC = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    }
+
+    const updatedGame = await Game.findByIdAndUpdate(gameId, updateFields, {
+      new: true,
+    });
 
     console.log(`✅ Game ${game.name} status forced to: ${forceStatus}`);
 
@@ -1066,7 +1027,7 @@ export const declareResult: RequestHandler = async (req, res) => {
     });
 
     // ✅ UPSERT GameResult for Charts integration
-    const resultDate = today.toISOString().split("T")[0]; // YYYY-MM-DD format
+    const resultDateString = today.toISOString().split("T")[0]; // YYYY-MM-DD format
     const resultNumber =
       fallbackResult || jodiResult || harufResult || crossingResult;
 
@@ -1074,8 +1035,8 @@ export const declareResult: RequestHandler = async (req, res) => {
       {
         gameId: gameId,
         resultDate: {
-          $gte: new Date(resultDate + "T00:00:00.000Z"),
-          $lt: new Date(resultDate + "T23:59:59.999Z"),
+          $gte: new Date(resultDateString + "T00:00:00.000Z"),
+          $lt: new Date(resultDateString + "T23:59:59.999Z"),
         },
       },
       {
@@ -1304,7 +1265,7 @@ function getGameIcon(gameName: string): string {
   if (name.includes("hyderabad")) return "💎";
   if (name.includes("rajdhani")) return "👑";
 
-  return "🎮";
+  return "���";
 }
 
 function getGameColor(gameName: string): string {

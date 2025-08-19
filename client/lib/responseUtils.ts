@@ -7,30 +7,22 @@ export async function safeParseResponse(response: Response): Promise<any> {
     url: response.url,
     type: response.type,
     redirected: response.redirected,
-    bodyUsed: response.bodyUsed
+    bodyUsed: response.bodyUsed,
   });
 
-  // Store all response properties IMMEDIATELY to avoid body consumption issues
-  const bodyUsed = response.bodyUsed;
+  // Store response properties to avoid body consumption issues
   const contentType = response.headers.get("content-type");
   const responseStatus = response.status;
   const responseStatusText = response.statusText;
-
-  // Check if response body has already been consumed
-  if (bodyUsed) {
-    console.error("❌ Response body already consumed at entry");
-    return {
-      success: false,
-      message: "Response body was already read",
-      error: true,
-    };
-  }
 
   try {
     console.log("🔍 About to read response.text()");
     // Always try to read as text first to avoid body consumption issues
     const textResponse = await response.text();
-    console.log("✅ Successfully read response.text(), length:", textResponse.length);
+    console.log(
+      "✅ Successfully read response.text(), length:",
+      textResponse.length,
+    );
 
     // Check if we got any content
     if (!textResponse) {
@@ -78,6 +70,21 @@ export async function safeParseResponse(response: Response): Promise<any> {
     }
   } catch (readError) {
     console.error("❌ Failed to read response:", readError);
+
+    // Check if this is a "body already read" error
+    const errorMessage =
+      readError instanceof Error ? readError.message : String(readError);
+    if (
+      errorMessage.includes("already read") ||
+      errorMessage.includes("body used")
+    ) {
+      console.error("❌ Response body was already consumed");
+      return {
+        success: false,
+        message: "Response body was already read",
+        error: true,
+      };
+    }
 
     return {
       success: false,

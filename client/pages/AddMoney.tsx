@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import BASE_URL from "../src/config";
+import { safeParseResponse } from "@/lib/responseUtils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -244,34 +245,18 @@ const AddMoney = () => {
         }),
       });
 
-      // Handle response more robustly
+      // Handle response more robustly using safe parsing
       let data = null;
       try {
-        // Clone the response to avoid "body stream already read" errors
-        const responseClone = response.clone();
+        data = await safeParseResponse(response);
 
-        // Try to parse as JSON first
-        try {
-          data = await response.json();
-        } catch (jsonError) {
-          console.log("JSON parsing failed, trying text:", jsonError.message);
-          // If JSON parsing fails, try reading as text from the cloned response
-          try {
-            const responseText = await responseClone.text();
-            console.log("Response text:", responseText);
-
-            // Try to parse the text as JSON
-            if (responseText) {
-              data = JSON.parse(responseText);
-            }
-          } catch (textError) {
-            console.error("Could not read response as text:", textError);
-            // If we can't read the response, create a default response based on status
-            if (response.ok) {
-              data = { message: "Payment request submitted successfully!" };
-            } else {
-              data = { message: "Failed to submit payment request" };
-            }
+        if (data.error) {
+          console.error("Response parsing failed:", data.message);
+          // Create a default response based on status if parsing fails
+          if (response.ok) {
+            data = { message: "Payment request submitted successfully!" };
+          } else {
+            data = { message: "Failed to submit payment request" };
           }
         }
       } catch (error) {
@@ -312,50 +297,52 @@ const AddMoney = () => {
     alert("Copied to clipboard!");
   };
 
- const handleFileUpload = async (file: File) => {
-  setUploadingFile(true);
-  try {
-    const token = localStorage.getItem("matka_token");
-    if (!token) {
-      alert("Please login first");
-      return;
+  const handleFileUpload = async (file: File) => {
+    setUploadingFile(true);
+    try {
+      const token = localStorage.getItem("matka_token");
+      if (!token) {
+        alert("Please login first");
+        return;
+      }
+
+      console.log("🔄 Uploading payment proof file:", file.name);
+
+      const formData = new FormData();
+      formData.append("qr", file); // ✅ field name matches backend
+
+      const response = await fetch(`${BASE_URL}/api/upload/upload-qr`, {
+        // ✅ fixed route
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          // no content-type header
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Upload failed: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        console.log(
+          "✅ File uploaded successfully:",
+          data.url || data.data?.url,
+        );
+        setPaymentProof(data.url || data.data?.url); // ✅ defensive access
+      } else {
+        throw new Error(data.message || "Upload failed");
+      }
+    } catch (error) {
+      console.error("❌ File upload error:", error);
+      alert("Failed to upload payment proof. Please try again.");
+    } finally {
+      setUploadingFile(false);
     }
-
-    console.log("🔄 Uploading payment proof file:", file.name);
-
-    const formData = new FormData();
-    formData.append("qr", file); // ✅ field name matches backend
-
-   const response = await fetch(`${BASE_URL}/api/upload/upload-qr`, {
- // ✅ fixed route
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        // no content-type header
-      },
-      body: formData,
-    });
-
-    if (!response.ok) {
-      throw new Error(`Upload failed: ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    if (data.success) {
-      console.log("✅ File uploaded successfully:", data.url || data.data?.url);
-      setPaymentProof(data.url || data.data?.url); // ✅ defensive access
-    } else {
-      throw new Error(data.message || "Upload failed");
-    }
-  } catch (error) {
-    console.error("❌ File upload error:", error);
-    alert("Failed to upload payment proof. Please try again.");
-  } finally {
-    setUploadingFile(false);
-  }
-};
-
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -468,9 +455,7 @@ const AddMoney = () => {
               </div>
             ) : (
               <Tabs defaultValue="upi" className="w-full">
-               <TabsList className="grid w-full grid-cols-3 gap-2 sm:gap-0 bg-muted/20">
-
-
+                <TabsList className="grid w-full grid-cols-3 gap-2 sm:gap-0 bg-muted/20">
                   <TabsTrigger
                     value="upi"
                     className="data-[state=active]:bg-matka-gold data-[state=active]:text-matka-dark"
@@ -497,15 +482,14 @@ const AddMoney = () => {
                 <TabsContent value="upi" className="space-y-3 w-full">
                   {upiGateways.map((gateway) => (
                     <Card
-  key={gateway._id}
-  className={`cursor-pointer transition-all w-full rounded-xl shadow-sm p-2 ${
-    selectedGateway?._id === gateway._id
-      ? "border-matka-gold bg-matka-gold/10"
-      : "border-border hover:border-border/80"
-  }`}
-  onClick={() => setSelectedGateway(gateway)}
->
-
+                      key={gateway._id}
+                      className={`cursor-pointer transition-all w-full rounded-xl shadow-sm p-2 ${
+                        selectedGateway?._id === gateway._id
+                          ? "border-matka-gold bg-matka-gold/10"
+                          : "border-border hover:border-border/80"
+                      }`}
+                      onClick={() => setSelectedGateway(gateway)}
+                    >
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                           <div>
@@ -708,32 +692,35 @@ const AddMoney = () => {
                           </Button>
                         </div>
                       </div>
-       {selectedGateway.qrCodeUrl && (() => {
-  const qrUrl = selectedGateway.qrCodeUrl;
+                      {selectedGateway.qrCodeUrl &&
+                        (() => {
+                          const qrUrl = selectedGateway.qrCodeUrl;
 
-  // ✅ Dynamically replace base URL only if needed
-  const encodedUrl = encodeURI(
-    qrUrl.includes("cdn.matkahub.com")
-      ? qrUrl.replace("https://cdn.matkahub.com", BASE_URL)
-      : qrUrl
-  );
+                          // ✅ Dynamically replace base URL only if needed
+                          const encodedUrl = encodeURI(
+                            qrUrl.includes("cdn.matkahub.com")
+                              ? qrUrl.replace(
+                                  "https://cdn.matkahub.com",
+                                  BASE_URL,
+                                )
+                              : qrUrl,
+                          );
 
-  console.log("✅ Final Encoded QR URL:", encodedUrl);
+                          console.log("✅ Final Encoded QR URL:", encodedUrl);
 
-  return (
-    <div className="text-center">
-      <img
-        src={encodedUrl}
-        alt="QR Code"
-        className="w-48 h-48 object-contain mx-auto rounded-lg bg-white"
-      />
-      <p className="text-sm text-muted-foreground mt-2">
-        Scan QR code to pay
-      </p>
-    </div>
-  );
-})()}
-
+                          return (
+                            <div className="text-center">
+                              <img
+                                src={encodedUrl}
+                                alt="QR Code"
+                                className="w-48 h-48 object-contain mx-auto rounded-lg bg-white"
+                              />
+                              <p className="text-sm text-muted-foreground mt-2">
+                                Scan QR code to pay
+                              </p>
+                            </div>
+                          );
+                        })()}
                     </div>
                   )}
 
