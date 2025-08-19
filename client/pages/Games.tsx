@@ -32,6 +32,10 @@ interface Game {
   harufPayout: number;
   crossingPayout: number;
   currentStatus: "waiting" | "open" | "closed" | "result_declared";
+  acceptingBets?: boolean;
+  endTimeUTC?: string;
+  autoClosedAt?: string;
+  forcedStatus?: "waiting" | "open" | "closed" | "result_declared";
 }
 
 interface GameResult {
