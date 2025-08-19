@@ -101,7 +101,7 @@ export async function robustFetch(
         return {
           success: false,
           error: 'Invalid JSON response from server',
-          status: response.status,
+          status: responseStatus,
         };
       }
 
