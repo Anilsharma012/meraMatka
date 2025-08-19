@@ -558,25 +558,36 @@ const GamePlay = () => {
 
       console.log("🎯 Placing REAL bet in MongoDB:", betPayload);
 
-      // Add AbortController to prevent race conditions if user clicks multiple times
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => {
-        console.log("⏰ Bet request timeout after 15 seconds");
-        controller.abort();
-      }, 15000);
+      // Create isolated fetch function to avoid any potential conflicts
+      const placeBetRequest = async () => {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => {
+          console.log("⏰ Bet request timeout after 15 seconds");
+          controller.abort();
+        }, 15000);
 
-      const response = await fetch(`${BASE_URL}/api/games/place-bet`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(betPayload),
-        signal: controller.signal,
-      });
+        try {
+          const response = await fetch(`${BASE_URL}/api/games/place-bet`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(betPayload),
+            signal: controller.signal,
+            // Add cache control to prevent any caching issues
+            cache: 'no-cache',
+          });
 
-      // Clear timeout if request completes successfully
-      clearTimeout(timeoutId);
+          clearTimeout(timeoutId);
+          return response;
+        } catch (error) {
+          clearTimeout(timeoutId);
+          throw error;
+        }
+      };
+
+      const response = await placeBetRequest();
 
       // Clone response immediately to prevent any body consumption issues
       const responseClone = response.clone();
