@@ -673,14 +673,25 @@ const GamePlay = () => {
           });
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("❌ Network error:", error);
-      toast({
-        variant: "destructive",
-        title: "Network Error",
-        description:
-          "Failed to connect to server. Please check your internet connection.",
-      });
+
+      // Handle different types of errors
+      if (error.name === "AbortError") {
+        console.log("🔌 Bet request was aborted (timeout or cancellation)");
+        toast({
+          variant: "destructive",
+          title: "Request Timeout",
+          description: "Bet request took too long. Please try again.",
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Network Error",
+          description:
+            "Failed to connect to server. Please check your internet connection.",
+        });
+      }
     } finally {
       setPlacing(false);
     }
