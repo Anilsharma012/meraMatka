@@ -775,13 +775,22 @@ export const forceGameStatus: RequestHandler = async (req, res) => {
       return;
     }
 
-    // Store the forced status in a custom field
+    // Store the forced status and update related fields
+    const updateFields: any = {
+      forcedStatus: forceStatus,
+      lastStatusChange: new Date(),
+    };
+
+    // If forcing to open, also set acceptingBets to true and extend endTimeUTC
+    if (forceStatus === "open") {
+      updateFields.acceptingBets = true;
+      // Set endTimeUTC to 24 hours from now to prevent auto-close
+      updateFields.endTimeUTC = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    }
+
     const updatedGame = await Game.findByIdAndUpdate(
       gameId,
-      {
-        forcedStatus: forceStatus,
-        lastStatusChange: new Date(),
-      },
+      updateFields,
       { new: true },
     );
 
@@ -1254,7 +1263,7 @@ function getGameIcon(gameName: string): string {
   if (name.includes("hyderabad")) return "💎";
   if (name.includes("rajdhani")) return "👑";
 
-  return "🎮";
+  return "���";
 }
 
 function getGameColor(gameName: string): string {
