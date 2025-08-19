@@ -567,20 +567,12 @@ const GamePlay = () => {
         body: JSON.stringify(betPayload),
       });
 
-      // Store response properties IMMEDIATELY before any other operations
-      // This must be done synchronously to avoid any race conditions
-      const isResponseOk = response.ok;
-      const responseStatus = response.status;
-      const responseStatusText = response.statusText;
-      const responseBodyUsed = response.bodyUsed;
-      const responseHeaders = { ...Object.fromEntries(response.headers.entries()) };
-
-      // Handle response safely to avoid body reuse errors
+      // Log basic response info without consuming the body
       console.log("🔍 Response details:", {
-        status: responseStatus,
-        statusText: responseStatusText,
-        bodyUsed: responseBodyUsed,
-        headers: responseHeaders,
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+        bodyUsed: response.bodyUsed,
       });
 
       let data;
