@@ -90,16 +90,14 @@ const Charts = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // Clone response to avoid "body stream already read" error
-      const responseClone = response.clone();
-
+      // Use safe response parsing to avoid body consumption issues
       let data: ApiResponse;
       try {
         data = await response.json();
       } catch (jsonError) {
-        // Fallback to cloned response if original fails
-        console.warn('Failed to parse JSON from original response, trying clone:', jsonError);
-        data = await responseClone.json();
+        console.error('Failed to parse JSON response:', jsonError);
+        setError("Invalid response from server");
+        return;
       }
 
       if (data.success) {
