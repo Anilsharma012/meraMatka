@@ -130,9 +130,18 @@ const MatkaGames = () => {
                 <ArrowLeft className="h-5 w-5" />
               </Button>
               <div>
-                <h1 className="text-white font-bold text-2xl">
-                  🏺 Matka Games
-                </h1>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg overflow-hidden bg-gradient-to-br from-matka-gold via-yellow-500 to-matka-gold-dark flex items-center justify-center">
+                    <img
+                      src="https://cdn.builder.io/api/v1/image/assets%2F4993b79b8ae445d4ae5618117571cced%2Fe64b286aa1ac42399211375fb000825d?format=webp&width=800"
+                      alt="TheMatka Hub Logo"
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                  <h1 className="text-white font-bold text-2xl">
+                    Matka Games
+                  </h1>
+                </div>
                 <p className="text-gray-400 text-sm">
                   Choose your game and start betting
                 </p>
