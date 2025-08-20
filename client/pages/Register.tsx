@@ -176,7 +176,7 @@ const handleSubmit = async (e: React.FormEvent) => {
           <div className="w-16 h-16 mx-auto mb-3 relative">
             <div className="w-full h-full rounded-full bg-gradient-to-br from-matka-gold via-yellow-500 to-matka-gold-dark border-2 border-matka-gold shadow-xl flex items-center justify-center overflow-hidden">
               <img
-                src="https://cdn.builder.io/api/v1/image/assets%2F4993b79b8ae445d4ae5618117571cced%2Fe64b286aa1ac42399211375fb000825d?format=webp&width=800"
+                src="https://cdn.builder.io/api/v1/image/assets%2F4993b79b8ae445d4ae5618117571cced%2F153ac3ca01ab4ec5ab57493974ba19ec?format=webp&width=800"
                 alt="TheMatka Hub Logo"
                 className="w-full h-full object-contain"
               />
