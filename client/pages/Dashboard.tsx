@@ -137,8 +137,12 @@ const Dashboard = () => {
         <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-3 sm:py-4 lg:py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 sm:gap-3 lg:gap-4">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-matka-gold via-yellow-500 to-matka-gold-dark flex items-center justify-center shadow-lg">
-                <span className="text-sm sm:text-lg lg:text-xl">🏺</span>
+              <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-matka-gold via-yellow-500 to-matka-gold-dark flex items-center justify-center shadow-lg overflow-hidden">
+                <img
+                  src="https://cdn.builder.io/api/v1/image/assets%2F4993b79b8ae445d4ae5618117571cced%2F18d1fc9816444387b85873be8e99c252?format=webp&width=800"
+                  alt="TheMatka Hub Logo"
+                  className="w-full h-full object-contain"
+                />
               </div>
               <div>
                 <h1 className="text-matka-gold font-bold text-lg sm:text-xl lg:text-2xl">
