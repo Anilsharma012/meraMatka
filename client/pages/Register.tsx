@@ -44,121 +44,139 @@ const Register = () => {
     });
   };
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setLoading(true);
-  setError("");
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
-  if (formData.password !== formData.confirmPassword) {
-    setError("Passwords do not match");
-    setLoading(false);
-    return;
-  }
-
-  try {
-    // Runtime validation to catch configuration issues
-    const hostname = window.location.hostname;
-    const isProduction = hostname.includes('.fly.dev') || !hostname.includes('localhost');
-
-    if (isProduction && BASE_URL.includes('localhost')) {
-      console.error('❌ CRITICAL: Localhost URL detected in production environment!');
-      console.error('   Hostname:', hostname);
-      console.error('   BASE_URL:', BASE_URL);
-      console.error('   This will cause network errors. Please check configuration.');
-      setError('Configuration error: Invalid API endpoint. Please contact support.');
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match");
       setLoading(false);
       return;
     }
 
-    console.log('🔐 Registration attempt:', {
-      hostname,
-      isProduction,
-      BASE_URL,
-      endpoint: `${BASE_URL}/api/auth/register`,
-      formData: {
-        fullName: formData.fullName,
-        email: formData.email,
-        mobile: formData.mobile,
-        hasPassword: !!formData.password,
-        referralCode: formData.referralCode
+    try {
+      // Runtime validation to catch configuration issues
+      const hostname = window.location.hostname;
+      const isProduction =
+        hostname.includes(".fly.dev") || !hostname.includes("localhost");
+
+      if (isProduction && BASE_URL.includes("localhost")) {
+        console.error(
+          "❌ CRITICAL: Localhost URL detected in production environment!",
+        );
+        console.error("   Hostname:", hostname);
+        console.error("   BASE_URL:", BASE_URL);
+        console.error(
+          "   This will cause network errors. Please check configuration.",
+        );
+        setError(
+          "Configuration error: Invalid API endpoint. Please contact support.",
+        );
+        setLoading(false);
+        return;
       }
-    });
 
-    const result: any = await new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      const url = `${BASE_URL}/api/auth/register`;
-      console.log('🌐 Making registration request to:', url);
-      xhr.open("POST", url, true);
-      xhr.setRequestHeader("Content-Type", "application/json");
+      console.log("🔐 Registration attempt:", {
+        hostname,
+        isProduction,
+        BASE_URL,
+        endpoint: `${BASE_URL}/api/auth/register`,
+        formData: {
+          fullName: formData.fullName,
+          email: formData.email,
+          mobile: formData.mobile,
+          hasPassword: !!formData.password,
+          referralCode: formData.referralCode,
+        },
+      });
 
-      xhr.onload = () => {
-        console.log('📡 Registration response received:', {
-          status: xhr.status,
-          statusText: xhr.statusText,
-          responseText: xhr.responseText.substring(0, 200) + '...'
-        });
+      const result: any = await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        const url = `${BASE_URL}/api/auth/register`;
+        console.log("🌐 Making registration request to:", url);
+        xhr.open("POST", url, true);
+        xhr.setRequestHeader("Content-Type", "application/json");
 
-        try {
-          const data = JSON.parse(xhr.responseText);
-          resolve({
+        xhr.onload = () => {
+          console.log("📡 Registration response received:", {
             status: xhr.status,
-            data,
-            ok: xhr.status >= 200 && xhr.status < 300,
+            statusText: xhr.statusText,
+            responseText: xhr.responseText.substring(0, 200) + "...",
           });
-        } catch (parseError) {
-          console.error('❌ Failed to parse registration response:', parseError);
-          reject(new Error(`Invalid response format: ${xhr.responseText}`));
-        }
-      };
 
-      xhr.onerror = () => {
-        console.error('❌ Registration XHR error:', {
-          readyState: xhr.readyState,
-          status: xhr.status,
-          statusText: xhr.statusText,
-          responseText: xhr.responseText
-        });
-        reject(new Error(`Network error: Unable to connect to ${url}. Please check your connection and try again.`));
-      };
+          try {
+            const data = JSON.parse(xhr.responseText);
+            resolve({
+              status: xhr.status,
+              data,
+              ok: xhr.status >= 200 && xhr.status < 300,
+            });
+          } catch (parseError) {
+            console.error(
+              "❌ Failed to parse registration response:",
+              parseError,
+            );
+            reject(new Error(`Invalid response format: ${xhr.responseText}`));
+          }
+        };
 
-      xhr.ontimeout = () => {
-        console.error('❌ Registration timeout');
-        reject(new Error("Request timeout: The server is taking too long to respond."));
-      };
+        xhr.onerror = () => {
+          console.error("❌ Registration XHR error:", {
+            readyState: xhr.readyState,
+            status: xhr.status,
+            statusText: xhr.statusText,
+            responseText: xhr.responseText,
+          });
+          reject(
+            new Error(
+              `Network error: Unable to connect to ${url}. Please check your connection and try again.`,
+            ),
+          );
+        };
 
-      // Set timeout
-      xhr.timeout = 30000; // 30 seconds
+        xhr.ontimeout = () => {
+          console.error("❌ Registration timeout");
+          reject(
+            new Error(
+              "Request timeout: The server is taking too long to respond.",
+            ),
+          );
+        };
 
-      xhr.send(
-        JSON.stringify({
-          fullName: formData.fullName.trim(),
-          email: formData.email.trim(),
-          mobile: formData.mobile.trim(),
-          password: formData.password,
-          ...(formData.referralCode && {
-            referralCode: formData.referralCode.trim(),
+        // Set timeout
+        xhr.timeout = 30000; // 30 seconds
+
+        xhr.send(
+          JSON.stringify({
+            fullName: formData.fullName.trim(),
+            email: formData.email.trim(),
+            mobile: formData.mobile.trim(),
+            password: formData.password,
+            ...(formData.referralCode && {
+              referralCode: formData.referralCode.trim(),
+            }),
           }),
-        })
-      );
-    });
+        );
+      });
 
-    if (result.ok) {
-      login(result.data.token, result.data.user);
-      navigate("/dashboard");
-    } else {
-      setError(result.data.message || "Registration failed");
+      if (result.ok) {
+        login(result.data.token, result.data.user);
+        navigate("/dashboard");
+      } else {
+        setError(result.data.message || "Registration failed");
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("Unable to connect to server. Please try again later.");
+      }
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error("Registration error:", error);
-    if (error instanceof Error) {
-      setError(error.message);
-    } else {
-      setError("Unable to connect to server. Please try again later.");
-    }
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   return (
     <div className="min-h-screen bg-matka-dark flex items-center justify-center px-4 py-8 relative overflow-hidden">

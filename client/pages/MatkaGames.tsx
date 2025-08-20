@@ -138,9 +138,7 @@ const MatkaGames = () => {
                       className="w-full h-full object-contain"
                     />
                   </div>
-                  <h1 className="text-white font-bold text-2xl">
-                    Matka Games
-                  </h1>
+                  <h1 className="text-white font-bold text-2xl">Matka Games</h1>
                 </div>
                 <p className="text-gray-400 text-sm">
                   Choose your game and start betting

@@ -74,7 +74,11 @@ const Dashboard = () => {
       });
 
       clearTimeout(timeoutId);
-      console.log("📥 Wallet response received:", response.status, response.statusText);
+      console.log(
+        "📥 Wallet response received:",
+        response.status,
+        response.statusText,
+      );
 
       if (response.ok) {
         try {
@@ -93,9 +97,9 @@ const Dashboard = () => {
       console.error("❌ Error fetching wallet data:", error);
 
       // Check specific error types
-      if (error.name === 'AbortError') {
+      if (error.name === "AbortError") {
         console.log("⏰ Request timed out");
-      } else if (error.message?.includes('Failed to fetch')) {
+      } else if (error.message?.includes("Failed to fetch")) {
         console.log("🌐 Network error - server may be unreachable");
       }
 
@@ -200,7 +204,9 @@ const Dashboard = () => {
                     ) : walletData ? (
                       `₹${walletData?.depositBalance?.toLocaleString() || 0}`
                     ) : (
-                      <span className="text-red-500 text-sm">Failed to load</span>
+                      <span className="text-red-500 text-sm">
+                        Failed to load
+                      </span>
                     )}
                   </div>
                 </div>
