@@ -143,7 +143,8 @@ export const placeBet: RequestHandler = async (req, res) => {
   const session = await mongoose.startSession();
 
   try {
-    const { gameId, betType, betNumber, betAmount, betData } = req.body;
+    const { gameId, betType, betNumber, betData } = req.body;
+    let betAmount = req.body.betAmount;
     const userId = (req as any).user._id;
     const userEmail = (req as any).user.email;
 
@@ -1230,7 +1231,7 @@ export const getResultsByDate: RequestHandler = async (req, res) => {
       color: getGameColor(result.gameName),
     }));
 
-    console.log(`📊 Found ${formattedResults.length} results for ${dateStr}`);
+    console.log(`�� Found ${formattedResults.length} results for ${dateStr}`);
 
     res.json({
       ok: true,
