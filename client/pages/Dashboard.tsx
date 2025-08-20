@@ -74,7 +74,11 @@ const Dashboard = () => {
       });
 
       clearTimeout(timeoutId);
-      console.log("📥 Wallet response received:", response.status, response.statusText);
+      console.log(
+        "📥 Wallet response received:",
+        response.status,
+        response.statusText,
+      );
 
       if (response.ok) {
         try {
@@ -93,9 +97,9 @@ const Dashboard = () => {
       console.error("❌ Error fetching wallet data:", error);
 
       // Check specific error types
-      if (error.name === 'AbortError') {
+      if (error.name === "AbortError") {
         console.log("⏰ Request timed out");
-      } else if (error.message?.includes('Failed to fetch')) {
+      } else if (error.message?.includes("Failed to fetch")) {
         console.log("🌐 Network error - server may be unreachable");
       }
 
@@ -137,8 +141,12 @@ const Dashboard = () => {
         <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-3 sm:py-4 lg:py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 sm:gap-3 lg:gap-4">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-matka-gold via-yellow-500 to-matka-gold-dark flex items-center justify-center shadow-lg">
-                <span className="text-sm sm:text-lg lg:text-xl">🏺</span>
+              <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-matka-gold via-yellow-500 to-matka-gold-dark flex items-center justify-center shadow-lg overflow-hidden">
+                <img
+                  src="https://cdn.builder.io/api/v1/image/assets%2F4993b79b8ae445d4ae5618117571cced%2F153ac3ca01ab4ec5ab57493974ba19ec?format=webp&width=800"
+                  alt="TheMatka Hub Logo"
+                  className="w-full h-full object-contain"
+                />
               </div>
               <div>
                 <h1 className="text-matka-gold font-bold text-lg sm:text-xl lg:text-2xl">
@@ -196,7 +204,9 @@ const Dashboard = () => {
                     ) : walletData ? (
                       `₹${walletData?.depositBalance?.toLocaleString() || 0}`
                     ) : (
-                      <span className="text-red-500 text-sm">Failed to load</span>
+                      <span className="text-red-500 text-sm">
+                        Failed to load
+                      </span>
                     )}
                   </div>
                 </div>

@@ -22,8 +22,12 @@ const GamesHub = () => {
             </div>
           </div>
 
-          <div className="w-16 h-16 bg-gradient-to-br from-matka-gold via-yellow-500 to-matka-gold-dark rounded-full flex items-center justify-center border-4 border-matka-gold/30">
-            <span className="text-2xl">🏺</span>
+          <div className="w-16 h-16 bg-gradient-to-br from-matka-gold via-yellow-500 to-matka-gold-dark rounded-full flex items-center justify-center border-4 border-matka-gold/30 overflow-hidden">
+            <img
+              src="https://cdn.builder.io/api/v1/image/assets%2F4993b79b8ae445d4ae5618117571cced%2F153ac3ca01ab4ec5ab57493974ba19ec?format=webp&width=800"
+              alt="TheMatka Hub Logo"
+              className="w-full h-full object-contain"
+            />
           </div>
 
           <div className="flex items-center gap-3">
@@ -112,8 +116,12 @@ const GamesHub = () => {
             </div>
 
             {/* Pot Icon */}
-            <div className="absolute bottom-4 right-6 w-16 h-16 bg-matka-dark/10 rounded-full flex items-center justify-center">
-              <span className="text-3xl opacity-50">🏺</span>
+            <div className="absolute bottom-4 right-6 w-16 h-16 bg-matka-dark/10 rounded-full flex items-center justify-center overflow-hidden">
+              <img
+                src="https://cdn.builder.io/api/v1/image/assets%2F4993b79b8ae445d4ae5618117571cced%2F153ac3ca01ab4ec5ab57493974ba19ec?format=webp&width=800"
+                alt="TheMatka Hub Logo"
+                className="w-full h-full object-contain opacity-50"
+              />
             </div>
           </CardContent>
         </Card>

@@ -102,8 +102,12 @@ const ForgotPassword = () => {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="w-20 h-20 mx-auto mb-4 relative">
-            <div className="w-full h-full rounded-full bg-gradient-to-br from-matka-gold via-yellow-500 to-matka-gold-dark border-3 border-matka-gold shadow-xl flex items-center justify-center">
-              <span className="text-3xl">🏺</span>
+            <div className="w-full h-full rounded-full bg-gradient-to-br from-matka-gold via-yellow-500 to-matka-gold-dark border-3 border-matka-gold shadow-xl flex items-center justify-center overflow-hidden">
+              <img
+                src="https://cdn.builder.io/api/v1/image/assets%2F4993b79b8ae445d4ae5618117571cced%2F153ac3ca01ab4ec5ab57493974ba19ec?format=webp&width=800"
+                alt="TheMatka Hub Logo"
+                className="w-full h-full object-contain"
+              />
             </div>
           </div>
           <h1 className="text-matka-gold text-2xl font-bold">Reset Password</h1>

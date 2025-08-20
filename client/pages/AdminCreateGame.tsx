@@ -73,7 +73,7 @@ const AdminCreateGame = () => {
     "Delhi Bazar",
     "Disawer",
     "Gali",
-    "Gaziyabad", 
+    "Gaziyabad",
     "Faridabad",
     "Ghaziabad",
     "New Delhi",
@@ -93,15 +93,33 @@ const AdminCreateGame = () => {
 
   // Common time slots
   const timeSlots = [
-    "05:00", "06:00", "07:00", "08:00", "09:00", "10:00",
-    "11:00", "12:00", "13:00", "14:00", "15:00", "16:00",
-    "17:00", "18:00", "19:00", "20:00", "21:00", "22:00"
+    "05:00",
+    "06:00",
+    "07:00",
+    "08:00",
+    "09:00",
+    "10:00",
+    "11:00",
+    "12:00",
+    "13:00",
+    "14:00",
+    "15:00",
+    "16:00",
+    "17:00",
+    "18:00",
+    "19:00",
+    "20:00",
+    "21:00",
+    "22:00",
   ];
 
-  const handleInputChange = (field: keyof GameForm, value: string | boolean) => {
-    setGameForm(prev => ({
+  const handleInputChange = (
+    field: keyof GameForm,
+    value: string | boolean,
+  ) => {
+    setGameForm((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
     // Clear error when user starts typing
     if (error) setError("");
@@ -121,7 +139,7 @@ const AdminCreateGame = () => {
       return false;
     }
     if (!gameForm.drawTime) {
-      setError("Draw time is required");
+      setError("Result time is required");
       return false;
     }
     if (parseInt(gameForm.minBetAmount) >= parseInt(gameForm.maxBetAmount)) {
@@ -133,7 +151,7 @@ const AdminCreateGame = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
     setLoading(true);
@@ -149,15 +167,16 @@ const AdminCreateGame = () => {
 
       // Runtime validation for production URLs
       const hostname = window.location.hostname;
-      const isProduction = hostname.includes('.fly.dev') || !hostname.includes('localhost');
+      const isProduction =
+        hostname.includes(".fly.dev") || !hostname.includes("localhost");
       let createUrl = `${BASE_URL}/api/admin/games`;
-      
-      if (isProduction && BASE_URL.includes('localhost')) {
+
+      if (isProduction && BASE_URL.includes("localhost")) {
         createUrl = `/api/admin/games`;
       }
 
       console.log("🎮 Creating game:", gameForm);
-      
+
       const response = await fetch(createUrl, {
         method: "POST",
         headers: {
@@ -169,28 +188,29 @@ const AdminCreateGame = () => {
           type: gameForm.type,
           startTime: gameForm.startTime,
           endTime: gameForm.endTime,
-          drawTime: gameForm.drawTime,
+          resultTime: gameForm.drawTime, // Send as resultTime for backend
+          drawTime: gameForm.drawTime, // Also send drawTime for compatibility
           description: gameForm.description.trim(),
-          maxBetAmount: parseInt(gameForm.maxBetAmount),
-          minBetAmount: parseInt(gameForm.minBetAmount),
+          minBet: parseInt(gameForm.minBetAmount),
+          maxBet: parseInt(gameForm.maxBetAmount),
           isActive: gameForm.isActive,
-          payoutRates: {
-            jodi: parseFloat(gameForm.jodiPayout),
-            haruf: parseFloat(gameForm.harufPayout),
-            crossing: parseFloat(gameForm.crossingPayout),
-          }
+          jodiPayout: parseFloat(gameForm.jodiPayout),
+          harufPayout: parseFloat(gameForm.harufPayout),
+          crossingPayout: parseFloat(gameForm.crossingPayout),
         }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+        throw new Error(
+          data.message || `HTTP error! status: ${response.status}`,
+        );
       }
 
       if (data.success) {
         setSuccess(`🎉 Game "${gameForm.name}" created successfully!`);
-        
+
         // Reset form
         setTimeout(() => {
           navigate("/admin/game-management");
@@ -198,10 +218,11 @@ const AdminCreateGame = () => {
       } else {
         setError(data.message || "Failed to create game");
       }
-
     } catch (error) {
       console.error("Error creating game:", error);
-      setError(error instanceof Error ? error.message : "Failed to create game");
+      setError(
+        error instanceof Error ? error.message : "Failed to create game",
+      );
     } finally {
       setLoading(false);
     }
@@ -230,14 +251,18 @@ const AdminCreateGame = () => {
         {error && (
           <Alert className="mb-6 border-red-500 bg-red-500/10">
             <AlertCircle className="h-4 w-4" />
-            <AlertDescription className="text-red-300">{error}</AlertDescription>
+            <AlertDescription className="text-red-300">
+              {error}
+            </AlertDescription>
           </Alert>
         )}
 
         {success && (
           <Alert className="mb-6 border-green-500 bg-green-500/10">
             <Settings className="h-4 w-4" />
-            <AlertDescription className="text-green-300">{success}</AlertDescription>
+            <AlertDescription className="text-green-300">
+              {success}
+            </AlertDescription>
           </Alert>
         )}
 
@@ -253,7 +278,9 @@ const AdminCreateGame = () => {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="name" className="text-gray-300">Game Name *</Label>
+                  <Label htmlFor="name" className="text-gray-300">
+                    Game Name *
+                  </Label>
                   <Input
                     id="name"
                     value={gameForm.name}
@@ -278,7 +305,9 @@ const AdminCreateGame = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="type" className="text-gray-300">Game Type *</Label>
+                  <Label htmlFor="type" className="text-gray-300">
+                    Game Type *
+                  </Label>
                   <Select
                     value={gameForm.type}
                     onValueChange={(value) => handleInputChange("type", value)}
@@ -288,7 +317,11 @@ const AdminCreateGame = () => {
                     </SelectTrigger>
                     <SelectContent className="bg-gray-800 border-gray-600">
                       {gameTypes.map((type) => (
-                        <SelectItem key={type.value} value={type.value} className="text-white hover:bg-gray-700">
+                        <SelectItem
+                          key={type.value}
+                          value={type.value}
+                          className="text-white hover:bg-gray-700"
+                        >
                           {type.label}
                         </SelectItem>
                       ))}
@@ -298,11 +331,15 @@ const AdminCreateGame = () => {
               </div>
 
               <div>
-                <Label htmlFor="description" className="text-gray-300">Description</Label>
+                <Label htmlFor="description" className="text-gray-300">
+                  Description
+                </Label>
                 <Textarea
                   id="description"
                   value={gameForm.description}
-                  onChange={(e) => handleInputChange("description", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("description", e.target.value)
+                  }
                   className="bg-gray-800 border-gray-600 text-white"
                   placeholder="Optional game description..."
                   rows={3}
@@ -322,17 +359,25 @@ const AdminCreateGame = () => {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="startTime" className="text-gray-300">Start Time *</Label>
+                  <Label htmlFor="startTime" className="text-gray-300">
+                    Start Time *
+                  </Label>
                   <Select
                     value={gameForm.startTime}
-                    onValueChange={(value) => handleInputChange("startTime", value)}
+                    onValueChange={(value) =>
+                      handleInputChange("startTime", value)
+                    }
                   >
                     <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
                       <SelectValue placeholder="Select start time" />
                     </SelectTrigger>
                     <SelectContent className="bg-gray-800 border-gray-600">
                       {timeSlots.map((time) => (
-                        <SelectItem key={time} value={time} className="text-white hover:bg-gray-700">
+                        <SelectItem
+                          key={time}
+                          value={time}
+                          className="text-white hover:bg-gray-700"
+                        >
                           {time}
                         </SelectItem>
                       ))}
@@ -341,17 +386,25 @@ const AdminCreateGame = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="endTime" className="text-gray-300">End Time *</Label>
+                  <Label htmlFor="endTime" className="text-gray-300">
+                    End Time *
+                  </Label>
                   <Select
                     value={gameForm.endTime}
-                    onValueChange={(value) => handleInputChange("endTime", value)}
+                    onValueChange={(value) =>
+                      handleInputChange("endTime", value)
+                    }
                   >
                     <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
                       <SelectValue placeholder="Select end time" />
                     </SelectTrigger>
                     <SelectContent className="bg-gray-800 border-gray-600">
                       {timeSlots.map((time) => (
-                        <SelectItem key={time} value={time} className="text-white hover:bg-gray-700">
+                        <SelectItem
+                          key={time}
+                          value={time}
+                          className="text-white hover:bg-gray-700"
+                        >
                           {time}
                         </SelectItem>
                       ))}
@@ -360,17 +413,25 @@ const AdminCreateGame = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="drawTime" className="text-gray-300">Draw Time *</Label>
+                  <Label htmlFor="drawTime" className="text-gray-300">
+                    Result Time *
+                  </Label>
                   <Select
                     value={gameForm.drawTime}
-                    onValueChange={(value) => handleInputChange("drawTime", value)}
+                    onValueChange={(value) =>
+                      handleInputChange("drawTime", value)
+                    }
                   >
                     <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
                       <SelectValue placeholder="Select draw time" />
                     </SelectTrigger>
                     <SelectContent className="bg-gray-800 border-gray-600">
                       {timeSlots.map((time) => (
-                        <SelectItem key={time} value={time} className="text-white hover:bg-gray-700">
+                        <SelectItem
+                          key={time}
+                          value={time}
+                          className="text-white hover:bg-gray-700"
+                        >
                           {time}
                         </SelectItem>
                       ))}
@@ -392,24 +453,32 @@ const AdminCreateGame = () => {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="minBetAmount" className="text-gray-300">Minimum Bet Amount (₹)</Label>
+                  <Label htmlFor="minBetAmount" className="text-gray-300">
+                    Minimum Bet Amount (₹)
+                  </Label>
                   <Input
                     id="minBetAmount"
                     type="number"
                     value={gameForm.minBetAmount}
-                    onChange={(e) => handleInputChange("minBetAmount", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("minBetAmount", e.target.value)
+                    }
                     className="bg-gray-800 border-gray-600 text-white"
                     min="1"
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="maxBetAmount" className="text-gray-300">Maximum Bet Amount (₹)</Label>
+                  <Label htmlFor="maxBetAmount" className="text-gray-300">
+                    Maximum Bet Amount (₹)
+                  </Label>
                   <Input
                     id="maxBetAmount"
                     type="number"
                     value={gameForm.maxBetAmount}
-                    onChange={(e) => handleInputChange("maxBetAmount", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("maxBetAmount", e.target.value)
+                    }
                     className="bg-gray-800 border-gray-600 text-white"
                     min="1"
                   />
@@ -418,39 +487,51 @@ const AdminCreateGame = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="jodiPayout" className="text-gray-300">Jodi Payout Rate</Label>
+                  <Label htmlFor="jodiPayout" className="text-gray-300">
+                    Jodi Payout Rate
+                  </Label>
                   <Input
                     id="jodiPayout"
                     type="number"
                     step="0.1"
                     value={gameForm.jodiPayout}
-                    onChange={(e) => handleInputChange("jodiPayout", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("jodiPayout", e.target.value)
+                    }
                     className="bg-gray-800 border-gray-600 text-white"
                     min="1"
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="harufPayout" className="text-gray-300">Haruf Payout Rate</Label>
+                  <Label htmlFor="harufPayout" className="text-gray-300">
+                    Haruf Payout Rate
+                  </Label>
                   <Input
                     id="harufPayout"
                     type="number"
                     step="0.1"
                     value={gameForm.harufPayout}
-                    onChange={(e) => handleInputChange("harufPayout", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("harufPayout", e.target.value)
+                    }
                     className="bg-gray-800 border-gray-600 text-white"
                     min="1"
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="crossingPayout" className="text-gray-300">Crossing Payout Rate</Label>
+                  <Label htmlFor="crossingPayout" className="text-gray-300">
+                    Crossing Payout Rate
+                  </Label>
                   <Input
                     id="crossingPayout"
                     type="number"
                     step="0.1"
                     value={gameForm.crossingPayout}
-                    onChange={(e) => handleInputChange("crossingPayout", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("crossingPayout", e.target.value)
+                    }
                     className="bg-gray-800 border-gray-600 text-white"
                     min="1"
                   />
@@ -466,7 +547,9 @@ const AdminCreateGame = () => {
                 type="checkbox"
                 id="isActive"
                 checked={gameForm.isActive}
-                onChange={(e) => handleInputChange("isActive", e.target.checked)}
+                onChange={(e) =>
+                  handleInputChange("isActive", e.target.checked)
+                }
                 className="w-4 h-4 text-yellow-500 bg-gray-800 border-gray-600 rounded focus:ring-yellow-500"
               />
               <Label htmlFor="isActive" className="text-gray-300">
