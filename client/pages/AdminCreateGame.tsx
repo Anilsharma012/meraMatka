@@ -169,16 +169,15 @@ const AdminCreateGame = () => {
           type: gameForm.type,
           startTime: gameForm.startTime,
           endTime: gameForm.endTime,
-          drawTime: gameForm.drawTime,
+          resultTime: gameForm.drawTime, // Send as resultTime for backend
+          drawTime: gameForm.drawTime,   // Also send drawTime for compatibility
           description: gameForm.description.trim(),
-          maxBetAmount: parseInt(gameForm.maxBetAmount),
-          minBetAmount: parseInt(gameForm.minBetAmount),
+          minBet: parseInt(gameForm.minBetAmount),
+          maxBet: parseInt(gameForm.maxBetAmount),
           isActive: gameForm.isActive,
-          payoutRates: {
-            jodi: parseFloat(gameForm.jodiPayout),
-            haruf: parseFloat(gameForm.harufPayout),
-            crossing: parseFloat(gameForm.crossingPayout),
-          }
+          jodiPayout: parseFloat(gameForm.jodiPayout),
+          harufPayout: parseFloat(gameForm.harufPayout),
+          crossingPayout: parseFloat(gameForm.crossingPayout),
         }),
       });
 
