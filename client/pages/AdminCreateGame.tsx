@@ -121,7 +121,7 @@ const AdminCreateGame = () => {
       return false;
     }
     if (!gameForm.drawTime) {
-      setError("Draw time is required");
+      setError("Result time is required");
       return false;
     }
     if (parseInt(gameForm.minBetAmount) >= parseInt(gameForm.maxBetAmount)) {
