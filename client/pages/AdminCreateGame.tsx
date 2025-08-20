@@ -359,7 +359,7 @@ const AdminCreateGame = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="drawTime" className="text-gray-300">Draw Time *</Label>
+                  <Label htmlFor="drawTime" className="text-gray-300">Result Time *</Label>
                   <Select
                     value={gameForm.drawTime}
                     onValueChange={(value) => handleInputChange("drawTime", value)}
